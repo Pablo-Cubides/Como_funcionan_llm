@@ -1,3 +1,8 @@
+export interface AttentionHead {
+  scores: number[][];
+  weights: number[][];
+}
+
 export interface ProcessData {
   originalText: string;
   tokens: string[];
@@ -5,6 +10,7 @@ export interface ProcessData {
   embeddings: number[][];
   positionalEncodings: number[][];
   combinedEmbeddings: number[][];
+  attentionHeads: AttentionHead[];
   attentionWeights: number[][];
   attentionScores: number[][];
   contextVectors: number[][];
@@ -14,7 +20,7 @@ export interface ProcessData {
 }
 
 export interface StepProps {
-  processData: ProcessData | null;
-  setProcessData: (data: ProcessData) => void;
-  isExplanationMode: boolean;
+  // The application uses a global ProcessContext; this legacy interface
+  // is intentionally empty to avoid accidental prop drilling.
+  // Components should use `useProcess()` instead.
 }

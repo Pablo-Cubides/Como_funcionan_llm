@@ -1,237 +1,181 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { computeAttention } from '../../utils/llm-simulation';
-import { ProcessData } from '../../types';
+import { useEffect, useState, useMemo } from 'react';
+import { computeMultiHeadAttention } from '../../utils/llm-simulation';
+import { useProcess } from '../../context/ProcessContext';
+import { AttentionHead } from '../../types';
 
-interface AttentionStepProps {
-  processData: ProcessData | null;
-  setProcessData: (data: ProcessData) => void;
-  isExplanationMode: boolean;
-}
-
-export default function AttentionStep({ 
-  processData, 
-  setProcessData, 
-  isExplanationMode 
-}: AttentionStepProps) {
+interface AttentionStepProps { onNext?: () => void }
+export default function AttentionStep({ onNext }: AttentionStepProps) {
+  const { state, dispatch } = useProcess();
+  const { processData, isExplanationMode } = state;
   const [hoveredCell, setHoveredCell] = useState<{row: number, col: number} | null>(null);
-  
-  useEffect(() => {
-    if (processData?.combinedEmbeddings && !processData.attentionWeights?.length) {
-      const { scores, weights } = computeAttention(processData.combinedEmbeddings);
-      
-      setProcessData({
-        ...processData,
-        attentionScores: scores,
-        attentionWeights: weights
-      });
-    }
-  }, [processData, setProcessData]);
+  const [selectedHead, setSelectedHead] = useState(0);
 
-  const getAttentionOpacity = (weight: number): string => {
-    if (weight === 0) return 'opacity-20';
-    const intensity = Math.min(weight * 3, 1);
-    return `opacity-${Math.round(intensity * 100)}`;
+    // snapshot embeddings to a stable reference for hook dependencies
+    const embeddingsSnapshot = useMemo(() => processData?.combinedEmbeddings ?? null, [processData?.combinedEmbeddings]);
+
+    // create a stable key for dependency based on length and first/last values to avoid deep equality
+    const combinedKey = useMemo(() => {
+      const arr = embeddingsSnapshot;
+      if (!arr) return '';
+      const first = arr[0]?.slice?.(0, 2) ?? [];
+      const last = arr[arr.length - 1]?.slice?.(-2) ?? [];
+      return `${arr.length}:${first.join(',')}:${last.join(',')}`;
+    }, [embeddingsSnapshot]);
+
+    useEffect(() => {
+      if (embeddingsSnapshot && processData && !processData.attentionHeads?.length) {
+        dispatch({ type: 'COMPUTE_ATTENTION', payload: { numHeads: 4 } });
+      }
+    }, [embeddingsSnapshot, processData, dispatch]);
+
+  const getAttentionColor = (weight: number): string => {
+    if (weight === 0) return 'bg-slate-800';
+    const alpha = Math.pow(weight, 0.5);
+    return `rgba(59, 130, 246, ${alpha})`;
   };
 
-  if (!processData?.attentionWeights?.length) {
-    return <div className="flex justify-center items-center h-64">
-      <div className="text-xl">Calculando atención...</div>
+  const attentionData = useMemo(() => {
+    if (!processData?.attentionHeads?.length) return [];
+    if (selectedHead === -1) {
+      return processData.attentionWeights || [];
+    }
+    return processData.attentionHeads[selectedHead]?.weights || [];
+  }, [processData?.attentionHeads, processData?.attentionWeights, selectedHead]);
+
+  if (!processData?.attentionHeads?.length) {
+    return <div className="p-8 sm:p-12 flex justify-center items-center min-h-[400px]">
+      <div className="text-xl text-slate-400">Calculando Atención...</div>
     </div>;
   }
 
   return (
-    <div className="max-w-6xl mx-auto py-8">
-      <h2 className="step-title">
-        Paso 3: Self-Attention (Autoatención)
-      </h2>
-      
-      {isExplanationMode && (
-        <div className="step-description">
-          El mecanismo de <strong>atención</strong> permite al modelo decidir qué tokens 
-          son importantes para entender cada palabra. Cada token &ldquo;mira&rdquo; a los 
-          tokens anteriores con diferentes pesos de atención.
-        </div>
-      )}
+    <div className="p-8 sm:p-12 panel">
+      <div className="text-center mb-12">
+        <h2 className="step-title">Paso 3: Multi-Head Self-Attention</h2>
+        {isExplanationMode && (
+          <p className="step-description">
+            🧠 <strong>Imagina que cada palabra puede &quot;mirar&quot; a todas las demás palabras para entenderlas mejor.</strong> 
+            Es como cuando lees una frase: tu cerebro conecta automáticamente las palabras relacionadas. 
+            El modelo hace esto con <strong>4 &quot;cerebros pequeños&quot;</strong> (cabezas) trabajando al mismo tiempo, 
+            cada uno buscando diferentes tipos de conexiones entre las palabras.
+          </p>
+        )}
+      </div>
 
-      <div className="space-y-8">
-        <div>
-          <h3 className="text-2xl font-bold mb-4 text-white">
-            Matriz de atención:
-          </h3>
-          <div className="bg-[#1f1f23] border border-gray-600 rounded-lg p-6">
-            <div className="mb-4 text-gray-300">
-              Cada fila muestra a qué tokens atiende el token correspondiente.
-              Hover sobre una celda para ver los detalles.
+  <div className="bg-gradient-to-br from-slate-900/60 to-slate-800/40 rounded-2xl border border-slate-700 p-8 shadow-xl">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <h3 className="text-2xl font-bold text-slate-200">Matriz de Pesos de Atención</h3>
+            <div className="flex items-center gap-3">
+                <label htmlFor="head-selector" className="text-sm font-semibold text-slate-300">Seleccionar Cabeza:</label>
+                <select 
+                    id="head-selector"
+                    value={selectedHead}
+                    onChange={(e) => setSelectedHead(Number(e.target.value))}
+                    className="bg-slate-800 text-white text-base font-medium rounded-xl px-4 py-2.5 border-2 border-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all cursor-pointer">
+                    <option value={-1}>🔗 Vista Combinada (todas)</option>
+                    {processData.attentionHeads.map((_, i) => (
+                        <option key={i} value={i}>🎯 Cabeza {i + 1}</option>
+                    ))}
+                </select>
             </div>
-            
-            <div className="overflow-x-auto">
-              <div className="inline-block min-w-full">
-                {/* Header con tokens */}
-                <div className="flex mb-2">
-                  <div className="w-20"></div>
+        </div>
+        <div className="overflow-x-auto">
+          <div className="inline-block min-w-full align-middle">
+            <table className="w-full border-separate border-spacing-1">
+              <thead>
+                <tr>
+                  <th className="sticky left-0 bg-slate-900/75 backdrop-blur-sm"></th>
                   {processData.tokens.map((token, index) => (
-                    <div 
-                      key={index} 
-                      className="w-16 h-16 flex items-center justify-center bg-gray-700 
-                               text-white text-sm font-bold border border-gray-600 
-                               transform -rotate-45 origin-center"
-                    >
-                      {token === ' ' ? '␣' : token.slice(0, 4)}
-                    </div>
+                    <th key={index} className="text-center font-medium text-slate-400 p-2">
+                      {token === ' ' ? '␣' : token}
+                    </th>
                   ))}
-                </div>
-                
-                {/* Matriz de atención */}
-                {processData.attentionWeights.map((row, rowIndex) => (
-                  <div key={rowIndex} className="flex mb-1">
-                    {/* Label del token */}
-                    <div className="w-20 h-16 flex items-center justify-center bg-gray-700 
-                                  text-white text-sm font-bold border border-gray-600">
-                      {processData.tokens[rowIndex] === ' ' ? '␣' : processData.tokens[rowIndex].slice(0, 4)}
-                    </div>
-                    
-                    {/* Celdas de atención */}
+                </tr>
+              </thead>
+              <tbody>
+                {attentionData.map((row, rowIndex) => (
+                  <tr key={rowIndex}>
+                    <th className="sticky left-0 bg-slate-900/75 backdrop-blur-sm text-right font-medium text-slate-400 p-2">
+                      {processData.tokens[rowIndex] === ' ' ? '␣' : processData.tokens[rowIndex]}
+                    </th>
                     {row.map((weight, colIndex) => (
-                      <div
+                      <td
                         key={colIndex}
-                        className={`w-16 h-16 border border-gray-600 cursor-pointer
-                                  transition-all duration-200 flex items-center justify-center
-                                  text-white text-xs font-bold relative group
-                                  ${weight === 0 ? 'bg-gray-800' : 'bg-red-600'} 
-                                  ${getAttentionOpacity(weight)}
-                                  ${hoveredCell?.row === rowIndex ? 'ring-2 ring-yellow-400' : ''}
-                                  ${hoveredCell?.col === colIndex ? 'ring-2 ring-blue-400' : ''}
-                                  hover:scale-105 hover:z-10`}
+                        className="relative rounded-md transition-all duration-150 ease-in-out"
+                        style={{ backgroundColor: getAttentionColor(weight) }}
                         onMouseEnter={() => setHoveredCell({row: rowIndex, col: colIndex})}
                         onMouseLeave={() => setHoveredCell(null)}
-                        title={`${processData.tokens[rowIndex]} → ${processData.tokens[colIndex]}: ${(weight * 100).toFixed(1)}%`}
                       >
-                        {weight > 0 ? (weight * 100).toFixed(0) : '—'}
-                        
-                        {/* Tooltip detallado */}
-                        <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 
-                                      bg-black text-white px-3 py-2 rounded text-sm 
-                                      opacity-0 group-hover:opacity-100 transition-opacity duration-200
-                                      pointer-events-none whitespace-nowrap z-20 border border-gray-500">
-                          <div className="font-bold">
-                            {processData.tokens[rowIndex]} → {processData.tokens[colIndex]}
-                          </div>
-                          <div>Peso: {(weight * 100).toFixed(2)}%</div>
-                          {weight === 0 && <div className="text-gray-400">Máscara causal</div>}
+                        <div className="w-16 h-16 flex items-center justify-center text-sm font-bold text-white/90">
+                          {(weight * 100).toFixed(0)}%
                         </div>
-                      </div>
+                        {hoveredCell?.row === rowIndex && hoveredCell?.col === colIndex && (
+                            <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-slate-950 text-white text-xs rounded-md shadow-lg z-10 whitespace-nowrap border border-slate-600">
+                                {processData.tokens[rowIndex]} → {processData.tokens[colIndex]}: {(weight * 100).toFixed(1)}%
+                            </div>
+                        )}
+                      </td>
                     ))}
-                  </div>
+                  </tr>
                 ))}
-              </div>
-            </div>
+              </tbody>
+            </table>
           </div>
         </div>
-
-        {hoveredCell && (
-          <div className="bg-[#1f1f23] border border-yellow-400 rounded-lg p-6">
-            <h4 className="text-xl font-bold mb-3 text-white">
-              Detalles de atención seleccionada:
-            </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <div className="text-lg font-semibold text-white mb-2">
-                  Token consultante:
-                </div>
-                <div className="bg-[#2d2d33] border border-gray-500 rounded-lg p-4">
-                  <span className="text-xl font-bold text-blue-400">
-                    {processData.tokens[hoveredCell.row] === ' ' ? '␣' : processData.tokens[hoveredCell.row]}
-                  </span>
-                  <span className="text-gray-400 ml-2">
-                    (posición {hoveredCell.row})
-                  </span>
-                </div>
-              </div>
-              
-              <div>
-                <div className="text-lg font-semibold text-white mb-2">
-                  Token atendido:
-                </div>
-                <div className="bg-[#2d2d33] border border-gray-500 rounded-lg p-4">
-                  <span className="text-xl font-bold text-red-400">
-                    {processData.tokens[hoveredCell.col] === ' ' ? '␣' : processData.tokens[hoveredCell.col]}
-                  </span>
-                  <span className="text-gray-400 ml-2">
-                    (posición {hoveredCell.col})
-                  </span>
-                </div>
-              </div>
-              
-              <div className="md:col-span-2">
-                <div className="text-lg font-semibold text-white mb-2">
-                  Peso de atención:
-                </div>
-                <div className="bg-[#2d2d33] border border-gray-500 rounded-lg p-4">
-                  <div className="flex items-center gap-4">
-                    <span className="text-2xl font-bold text-white">
-                      {(processData.attentionWeights[hoveredCell.row][hoveredCell.col] * 100).toFixed(2)}%
-                    </span>
-                    <div className="flex-1 bg-gray-600 h-4 rounded-lg overflow-hidden">
-                      <div 
-                        className="h-full bg-red-500"
-                        style={{
-                          width: `${Math.min(processData.attentionWeights[hoveredCell.row][hoveredCell.col] * 100, 100)}%`
-                        }}
-                      />
-                    </div>
-                  </div>
-                  {processData.attentionWeights[hoveredCell.row][hoveredCell.col] === 0 && (
-                    <div className="text-gray-400 mt-2">
-                      ⚠️ Bloqueado por máscara causal (no puede mirar tokens futuros)
-                    </div>
-                  )}
-                </div>
+    {isExplanationMode && (
+      <div className="mt-6 p-6 bg-gradient-to-br from-purple-950/30 to-slate-900/50 rounded-2xl border-2 border-purple-700/30">
+        <h4 className="font-bold text-xl text-purple-300 mb-3 flex items-center gap-2">
+          <span>🧠</span> ¿Cómo funciona Self-Attention?
+        </h4>
+        <div className="space-y-3 text-slate-300 text-sm leading-relaxed">
+          <p>
+            👀 <strong className="text-purple-400">La idea principal:</strong> Imagina que estás leyendo &quot;El gato comió pescado&quot;. 
+            Cuando lees &quot;comió&quot;, tu cerebro automáticamente piensa &quot;¿Quién comió? ¿Qué comió?&quot; y conecta &quot;gato&quot; con &quot;comió&quot; 
+            y &quot;comió&quot; con &quot;pescado&quot;. ¡Eso es exactamente lo que hace la atención! Los números en la tabla muestran qué tan conectadas están las palabras 
+            (100% = muy conectadas, 0% = no relacionadas).
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+            <div className="p-3 bg-slate-800/50 rounded-lg border border-slate-700">
+              <p className="font-semibold text-blue-400 mb-2">🔍 Query (Q): &quot;¿Qué busco?&quot;</p>
+              <p className="text-xs">Como cuando preguntas &quot;¿Quién comió?&quot; - es lo que una palabra quiere encontrar en las demás</p>
+            </div>
+            <div className="p-3 bg-slate-800/50 rounded-lg border border-slate-700">
+              <p className="font-semibold text-green-400 mb-2">🔑 Key (K): &quot;¿Qué soy yo?&quot;</p>
+              <p className="text-xs">La &quot;tarjeta de identificación&quot; de cada palabra que dice qué tipo de información tiene</p>
+            </div>
+            <div className="p-3 bg-slate-800/50 rounded-lg border border-slate-700">
+              <p className="font-semibold text-yellow-400 mb-2">📦 Value (V): &quot;¿Qué información llevo?&quot;</p>
+              <p className="text-xs">El contenido real que una palabra aporta cuando otras la necesitan</p>
+            </div>
+            <div className="p-3 bg-slate-800/50 rounded-lg border border-slate-700">
+              <p className="font-semibold text-purple-400 mb-2 font-mono text-sm">🔢 Attention = Softmax(QK<sup>T</sup>/√d<sub>k</sub>)V</p>
+              <div className="text-xs text-slate-400 space-y-1 pl-2">
+                <p>🔍 <strong className="text-purple-300">Q</strong> = lista de preguntas de cada palabra</p>
+                <p>🔑 <strong className="text-purple-300">K</strong> = lista de respuestas que cada palabra puede dar</p>
+                <p>📦 <strong className="text-purple-300">V</strong> = el contenido real de cada palabra</p>
+                <p>📏 <strong className="text-purple-300">d<sub>k</sub></strong> = número mágico para que los cálculos no se vuelvan locos</p>
+                <p>🎯 <strong className="text-purple-300">Softmax</strong> = convierte números en porcentajes que suman 100%</p>
               </div>
             </div>
           </div>
-        )}
-
-        {isExplanationMode && (
-          <div className="bg-[#1f1f23] border border-gray-600 rounded-lg p-6">
-            <h4 className="text-xl font-bold mb-4 text-white">
-              🔍 ¿Cómo funciona la atención?
-            </h4>
-            <div className="space-y-3 text-gray-300">
-              <p>
-                <strong>Consulta:</strong> Cada token (fila) pregunta qué otros tokens 
-                son relevantes para entenderlo mejor.
-              </p>
-              <p>
-                <strong>Atención:</strong> Los números muestran cuánta importancia se 
-                da a cada token anterior (columnas). 100% = máxima atención.
-              </p>
-              <p>
-                <strong>Máscara causal:</strong> Los tokens no pueden &ldquo;mirar al futuro&rdquo; 
-                (área gris), solo a tokens anteriores o a sí mismos.
-              </p>
-              <p>
-                <strong>Colores:</strong> Rojo más intenso = mayor atención. 
-                Gris = prohibido por la máscara causal.
-              </p>
-            </div>
-          </div>
-        )}
-
-        <div className="bg-[#0d1f0d] border border-green-600 rounded-lg p-4">
-          <div className="flex items-center gap-3">
-            <div className="text-green-400 text-2xl">✓</div>
-            <div>
-              <div className="text-green-400 font-bold text-lg">Atención calculada</div>
-              <div className="text-green-300">
-                Matriz de atención {processData.tokens.length}×{processData.tokens.length} generada • 
-                Máscara causal aplicada • 
-                Listo para calcular probabilidades
-              </div>
-            </div>
-          </div>
+          <p className="mt-4">
+            👥 <strong className="text-purple-400">¿Por qué {processData.attentionHeads.length} &quot;cabezas&quot;?</strong> 
+            Es como tener {processData.attentionHeads.length} amigos diferentes leyendo la misma frase. Uno se fija en quién hace qué, 
+            otro en los objetos, otro en el tiempo, etc. Al final juntas lo que todos vieron y ¡tienes una comprensión mucho más completa! 
+            Los LLMs grandes usan ¡decenas de cabezas!
+          </p>
         </div>
+      </div>
+    )}
+      </div>
+
+      <div className="text-center mt-8">
+        <button className="navigation-button px-8 py-3" onClick={() => onNext ? onNext() : null}>
+          <span>Siguiente: Probabilidades</span>
+          <span>→</span>
+        </button>
       </div>
     </div>
   );

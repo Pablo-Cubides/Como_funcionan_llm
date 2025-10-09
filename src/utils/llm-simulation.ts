@@ -1,4 +1,4 @@
-// Utility functions for simulating LLM operations
+import { AttentionHead, ProcessData } from '../types';
 
 // Simple hash function for deterministic token IDs
 export function hashToken(token: string): number {
@@ -8,7 +8,7 @@ export function hashToken(token: string): number {
     hash = ((hash << 5) - hash) + char;
     hash = hash & hash; // Convert to 32bit integer
   }
-  return Math.abs(hash) % 5000; // Map to vocabulary size
+  return Math.abs(hash) % 10000; // Expanded vocabulary size
 }
 
 // Simple tokenizer - splits on whitespace and punctuation
@@ -25,9 +25,8 @@ export function generateEmbedding(tokenId: number, dimensions: number = 16): num
   const seed = tokenId;
   
   for (let i = 0; i < dimensions; i++) {
-    // Seeded pseudo-random number generator
     const x = Math.sin(seed * (i + 1)) * 10000;
-    embedding.push((x - Math.floor(x)) * 2 - 1); // Map to [-1, 1]
+    embedding.push((x - Math.floor(x)) * 2 - 1);
   }
   
   return embedding;
@@ -53,53 +52,74 @@ export function addVectors(a: number[], b: number[]): number[] {
   return a.map((val, i) => val + b[i]);
 }
 
-// Simple toy attention mechanism
-export function computeAttention(
+// Compute a single attention head
+function computeAttentionHead(
   embeddings: number[][],
-  dimensions: number = 16
-): { scores: number[][], weights: number[][] } {
+  head_dimensions: number,
+  seed: number
+): AttentionHead {
   const seqLength = embeddings.length;
   const scores: number[][] = [];
   const weights: number[][] = [];
-  
-  // Generate simple Q, K, V matrices (deterministic)
-  const Q = embeddings.map(emb => emb.slice(0, dimensions));
-  const K = embeddings.map(emb => emb.slice(0, dimensions));
-  
-  // Compute attention scores
+
+  // Generate deterministic Q, K matrices for this head
+  const Q = embeddings.map(emb => generateEmbedding(hashToken(emb.join('') + `Q${seed}`), head_dimensions));
+  const K = embeddings.map(emb => generateEmbedding(hashToken(emb.join('') + `K${seed}`), head_dimensions));
+
   for (let i = 0; i < seqLength; i++) {
     scores[i] = [];
-    weights[i] = [];
-    
     for (let j = 0; j < seqLength; j++) {
-      // Dot product attention
       let score = 0;
-      for (let k = 0; k < dimensions; k++) {
+      for (let k = 0; k < head_dimensions; k++) {
         score += Q[i][k] * K[j][k];
       }
-      score = score / Math.sqrt(dimensions); // Scale
-      
-      // Apply causal mask (no looking at future tokens)
+      score /= Math.sqrt(head_dimensions);
       if (j > i) {
         score = -Infinity;
       }
-      
       scores[i][j] = score;
     }
-    
-    // Apply softmax to get attention weights
-    const maxScore = Math.max(...scores[i].filter(s => s !== -Infinity));
-    const expScores = scores[i].map(s => s === -Infinity ? 0 : Math.exp(s - maxScore));
-    const sumExp = expScores.reduce((sum, exp) => sum + exp, 0);
-    weights[i] = expScores.map(exp => exp / sumExp);
+
+    const maxScore = Math.max(...scores[i].filter(s => isFinite(s)));
+    const expScores = scores[i].map(s => isFinite(s) ? Math.exp(s - maxScore) : 0);
+    const sumExp = expScores.reduce((a, b) => a + b, 0);
+    weights[i] = expScores.map(s => sumExp > 0 ? s / sumExp : 0);
   }
-  
+
   return { scores, weights };
 }
 
-// Generate vocabulary for probability distribution
+// Compute multi-head attention
+export function computeMultiHeadAttention(
+  embeddings: number[][],
+  num_heads: number = 4,
+  dimensions: number = 16
+): { heads: AttentionHead[], combinedWeights: number[][] } {
+  const head_dimensions = dimensions / num_heads;
+  const heads: AttentionHead[] = [];
+
+  for (let i = 0; i < num_heads; i++) {
+    heads.push(computeAttentionHead(embeddings, head_dimensions, i));
+  }
+
+  // Combine weights for visualization (simple average)
+  const combinedWeights: number[][] = Array(embeddings.length).fill(0).map(() => Array(embeddings.length).fill(0));
+  for (let i = 0; i < embeddings.length; i++) {
+    for (let j = 0; j < embeddings.length; j++) {
+      let sum = 0;
+      for (let h = 0; h < num_heads; h++) {
+        sum += heads[h].weights[i][j];
+      }
+      combinedWeights[i][j] = sum / num_heads;
+    }
+  }
+
+  return { heads, combinedWeights };
+}
+
+// Generate expanded vocabulary
 export function generateVocabulary(): string[] {
-  const commonWords = [
+    const commonWords = [
     'el', 'la', 'de', 'que', 'y', 'es', 'en', 'un', 'se', 'no',
     'te', 'lo', 'le', 'da', 'su', 'por', 'son', 'con', 'para', 'al',
     'una', 'sus', 'del', 'las', 'como', 'pero', 'más', 'muy', 'ya', 'todo',
@@ -119,9 +139,9 @@ export function generateVocabulary(): string[] {
     'rojo', 'azul', 'verde', 'amarillo', 'negro', 'blanco', 'gris', 'marrón', 'rosa', 'naranja',
     'comer', 'beber', 'dormir', 'caminar', 'correr', 'jugar', 'estudiar', 'trabajar', 'leer', 'escribir',
     'música', 'película', 'juego', 'deporte', 'fútbol', 'tenis', 'natación', 'comida', 'bebida', 'pan',
-    'feliz', 'triste', 'contento', 'enojado', 'cansado', 'enfermo', 'sano', 'fuerte', 'débil', 'rápido'
+    'feliz', 'triste', 'contento', 'enojado', 'cansado', 'enfermo', 'sano', 'fuerte', 'débil', 'rápido',
+    'inteligencia', 'artificial', 'modelo', 'lenguaje', 'algoritmo', 'red', 'neuronal', 'aprendizaje', 'profundo'
   ];
-  
   return commonWords;
 }
 
@@ -134,7 +154,6 @@ export function computeProbabilities(
 ): { token: string; probability: number; id: number }[] {
   const probabilities: { token: string; probability: number; id: number }[] = [];
   
-  // Predefined logical continuations for demo texts
   const contextualPredictions: { [key: string]: string[] } = {
     'porque tienen alas': ['fuertes', 'ligeras', 'grandes', 'poderosas', 'hermosas'],
     'tecnología fascinante': ['que', 'para', 'con', 'muy', 'realmente'],
@@ -148,7 +167,6 @@ export function computeProbabilities(
     'su equipo': ['hacia', 'a', 'para', 'con', 'y']
   };
   
-  // Check if we have contextual predictions for the current text
   let preferredTokens: string[] = [];
   if (contextText) {
     for (const [context, tokens] of Object.entries(contextualPredictions)) {
@@ -159,46 +177,107 @@ export function computeProbabilities(
     }
   }
   
-  // Generate logits for each token in vocabulary
   vocabulary.forEach((token) => {
     const tokenId = hashToken(token);
-    
-    // Simple projection to logit (deterministic based on embedding and token)
     let logit = 0;
     for (let i = 0; i < lastEmbedding.length; i++) {
       const weight = Math.sin((tokenId + seed) * (i + 1)) * 0.1;
       logit += lastEmbedding[i] * weight;
     }
-    
-    // Boost probability for contextually relevant tokens
     if (preferredTokens.includes(token)) {
-      logit += 2.0; // Significant boost for contextual relevance
+      logit += 2.0;
     }
-    
     probabilities.push({ token, probability: logit, id: tokenId });
   });
   
-  // Apply softmax
   const maxLogit = Math.max(...probabilities.map(p => p.probability));
-  const expProbs = probabilities.map(p => ({
-    ...p,
-    probability: Math.exp(p.probability - maxLogit)
-  }));
-  
+  const expProbs = probabilities.map(p => ({ ...p, probability: Math.exp(p.probability - maxLogit) }));
   const sumExp = expProbs.reduce((sum, p) => sum + p.probability, 0);
-  const normalizedProbs = expProbs.map(p => ({
-    ...p,
-    probability: p.probability / sumExp
-  }));
-  
+  const normalizedProbs = expProbs.map(p => ({ ...p, probability: sumExp > 0 ? p.probability / sumExp : 1 / expProbs.length }));
+
   // Sort by probability and return top candidates
-  return normalizedProbs
-    .sort((a, b) => b.probability - a.probability)
-    .slice(0, 10);
+  const top = normalizedProbs.sort((a, b) => b.probability - a.probability).slice(0, 10);
+  return top;
 }
 
-// Sample next token (deterministic for demo purposes)
-export function sampleNextToken(probabilities: { token: string; probability: number }[]): string {
-  // For demo, just return the most likely token
-  return probabilities[0]?.token || '';
+// Sampling helpers
+export function sampleWithTemperature(
+  probabilities: { token: string; probability: number; id?: number }[],
+  temperature: number = 1.0
+): string {
+  if (!probabilities || probabilities.length === 0) return '';
+  if (temperature <= 0) temperature = 1e-6;
+
+  // Use probabilities as weights; apply temperature by exponentiation
+  const adjusted = probabilities.map(p => ({ ...p, score: Math.pow(p.probability, 1 / temperature) }));
+  const sum = adjusted.reduce((s, a) => s + a.score, 0);
+  if (sum <= 0) return probabilities[0].token;
+
+  let r = Math.random() * sum;
+  for (const a of adjusted) {
+    r -= a.score;
+    if (r <= 0) return a.token;
+  }
+  return adjusted[adjusted.length - 1].token;
+}
+
+export function sampleNextToken(
+  probabilities: { token: string; probability: number; id?: number }[],
+  strategyOrTemp: 'greedy' | 'random' | 'top-k' | number = 'greedy',
+  k: number = 5
+): string {
+  if (!probabilities || probabilities.length === 0) return '';
+
+  if (typeof strategyOrTemp === 'number') {
+    return sampleWithTemperature(probabilities, strategyOrTemp);
+  }
+
+  switch (strategyOrTemp) {
+    case 'random': {
+      const sum = probabilities.reduce((s, p) => s + p.probability, 0);
+      let r = Math.random() * sum;
+      for (const p of probabilities) {
+        r -= p.probability;
+        if (r <= 0) return p.token;
+      }
+      return probabilities[probabilities.length - 1].token;
+    }
+    case 'top-k': {
+      const topK = probabilities.slice(0, k);
+      const sum = topK.reduce((s, p) => s + p.probability, 0);
+      let r = Math.random() * sum;
+      for (const p of topK) {
+        r -= p.probability;
+        if (r <= 0) return p.token;
+      }
+      return topK[topK.length - 1].token;
+    }
+    case 'greedy':
+    default:
+      return probabilities[0].token;
+  }
+}
+
+export function runLLMStep(processData: ProcessData, text: string): ProcessData {
+    const newTokens = tokenize(text);
+    const newTokenIds = newTokens.map(token => hashToken(token));
+    const embeddings = newTokenIds.map(id => generateEmbedding(id, 16));
+    const positionalEncodings = newTokens.map((_, index) => generatePositionalEncoding(index, 16));
+    const combinedEmbeddings = embeddings.map((emb, index) => addVectors(emb, positionalEncodings[index]));
+    const { heads, combinedWeights } = computeMultiHeadAttention(combinedEmbeddings);
+    const lastEmbedding = combinedEmbeddings[combinedEmbeddings.length - 1];
+    const newProbabilities = computeProbabilities(lastEmbedding, processData.vocabulary, 42, text);
+
+    return {
+        ...processData,
+        originalText: text,
+        tokens: newTokens,
+        tokenIds: newTokenIds,
+        embeddings,
+        positionalEncodings,
+        combinedEmbeddings,
+        attentionHeads: heads,
+        attentionWeights: combinedWeights,
+        probabilities: newProbabilities,
+    };
 }

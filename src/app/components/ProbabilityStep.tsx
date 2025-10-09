@@ -1,235 +1,127 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { computeProbabilities, generateVocabulary } from '../../utils/llm-simulation';
-import { ProcessData } from '../../types';
+import { useProcess } from '../../context/ProcessContext';
 
-interface ProbabilityStepProps {
-  processData: ProcessData | null;
-  setProcessData: (data: ProcessData) => void;
-  isExplanationMode: boolean;
-}
+interface ProbabilityStepProps { onNext?: () => void }
 
-export default function ProbabilityStep({ 
-  processData, 
-  setProcessData, 
-  isExplanationMode 
-}: ProbabilityStepProps) {
-  
+export default function ProbabilityStep({ onNext }: ProbabilityStepProps) {
+  const { state, dispatch } = useProcess();
+  const { processData, isExplanationMode } = state;
+
+  const embeddingsSnapshot = useMemo(() => processData?.combinedEmbeddings ?? null, [processData?.combinedEmbeddings]);
+
   useEffect(() => {
-    if (processData?.combinedEmbeddings && !processData.probabilities?.length) {
-      const vocabulary = generateVocabulary();
-      const lastEmbedding = processData.combinedEmbeddings[processData.combinedEmbeddings.length - 1];
-      const probabilities = computeProbabilities(lastEmbedding, vocabulary, 42, processData.originalText);
-      
-      setProcessData({
-        ...processData,
-        vocabulary,
-        probabilities
-      });
+    if (embeddingsSnapshot && processData && !processData.probabilities?.length) {
+      dispatch({ type: 'COMPUTE_PROBABILITIES', payload: { seed: 42 } });
     }
-  }, [processData, setProcessData]);
-
-  const getBarColor = (probability: number, index: number): string => {
-    if (index === 0) return 'bg-red-600'; // Most likely
-    if (index === 1) return 'bg-red-500';
-    if (index === 2) return 'bg-red-400';
-    return 'bg-red-300';
-  };
-
-  const formatProbability = (prob: number): string => {
-    return (prob * 100).toFixed(2);
-  };
+  }, [embeddingsSnapshot, processData, dispatch]);
 
   if (!processData?.probabilities?.length) {
-    return <div className="flex justify-center items-center h-64">
-      <div className="text-xl">Calculando probabilidades...</div>
+    return <div className="p-8 sm:p-12 flex justify-center items-center min-h-[400px]">
+      <div className="text-xl text-slate-400">Calculando Probabilidades...</div>
     </div>;
   }
 
   const maxProbability = processData.probabilities[0]?.probability || 0;
 
   return (
-    <div className="max-w-6xl mx-auto py-8">
-      <h2 className="step-title">
-        Paso 4: Probabilidades del siguiente token
-      </h2>
-      
-      {isExplanationMode && (
-        <div className="step-description">
-          Basándose en el contexto procesado, el modelo calcula las <strong>probabilidades</strong> 
-          de cada posible token siguiente. Los tokens más probables aparecen en la parte superior.
-        </div>
-      )}
+    <div className="p-8 sm:p-12 panel">
+      <div className="text-center mb-12">
+        <h2 className="step-title">Paso 4: Probabilidades</h2>
+        {isExplanationMode && (
+          <p className="step-description">
+            🎲 <strong>Momento de adivinar:</strong> El modelo lee todas las palabras que ya tiene y piensa 
+            &quot;¿Cuál palabra debería venir después?&quot;. Es como jugar a completar frases: si dices &quot;Me gusta comer...&quot;, 
+            probablemente piensas en comida. El modelo hace lo mismo, pero con números que muestran qué tan seguro está de cada opción.
+          </p>
+        )}
+      </div>
 
-      <div className="space-y-8">
-        <div>
-          <h3 className="text-2xl font-bold mb-4 text-white">
-            Contexto actual:
-          </h3>
-          <div className="bg-[#1f1f23] border border-gray-600 rounded-lg p-6">
-            <div className="flex flex-wrap gap-2 mb-4">
-              {processData.tokens.map((token, index) => (
-                <span
-                  key={index}
-                  className={`px-3 py-2 rounded-lg text-white font-semibold
-                            ${index === processData.tokens.length - 1 
-                              ? 'bg-red-600 ring-2 ring-red-400' 
-                              : 'bg-gray-600'}`}
-                >
-                  {token === ' ' ? '␣' : token}
-                </span>
-              ))}
-              <span className="px-3 py-2 bg-yellow-600 text-white font-bold rounded-lg animate-pulse">
-                ?
-              </span>
-            </div>
-            <div className="text-gray-300">
-              El modelo predice qué token viene después de: &ldquo;
-              <span className="font-bold text-white">
-                {processData.originalText}
-              </span>
-              &rdquo;
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <h3 className="text-2xl font-bold mb-4 text-white">
-            Top 10 tokens más probables:
-          </h3>
-          
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 bg-gradient-to-br from-slate-900/60 to-slate-800/40 rounded-2xl border border-slate-700 p-8 shadow-xl">
+          <h3 className="text-2xl font-bold mb-6 text-slate-200">Top 10 Tokens Más Probables</h3>
           <div className="space-y-3">
             {processData.probabilities.slice(0, 10).map((item, index) => (
-              <div
-                key={index}
-                className="bg-[#1f1f23] border border-gray-600 rounded-lg p-4 
-                         hover:border-gray-500 transition-all duration-200"
-              >
-                <div className="flex items-center gap-4">
-                  {/* Ranking */}
-                  <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">
-                      {index + 1}
-                    </span>
+              <div key={index} className="flex items-center gap-4 p-3 rounded-xl hover:bg-slate-800/60 transition-all group">
+                <div className="flex items-center gap-3 min-w-[180px]">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-white font-bold text-base shadow-lg flex-shrink-0">
+                    {index + 1}
                   </div>
-                  
-                  {/* Token */}
-                  <div className="w-24">
-                    <span className="text-xl font-bold text-white">
-                      {item.token}
-                    </span>
-                  </div>
-                  
-                  {/* Probability bar */}
-                  <div className="flex-1 relative">
-                    <div className="bg-gray-700 h-8 rounded-lg overflow-hidden">
-                      <div
-                        className={`h-full ${getBarColor(item.probability, index)} 
-                                  transition-all duration-1000 ease-out flex items-center justify-end pr-3`}
-                        style={{
-                          width: `${(item.probability / maxProbability) * 100}%`
-                        }}
-                      >
-                        <span className="text-white font-bold text-sm">
-                          {formatProbability(item.probability)}%
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Token ID */}
-                  <div className="w-20 text-right">
-                    <span className="text-gray-400 text-sm font-mono">
-                      ID: {item.id}
-                    </span>
+                  <span className="font-bold text-xl text-slate-100 font-mono">{item.token}</span>
+                </div>
+                <div className="flex-grow bg-slate-700/30 rounded-full h-12 overflow-hidden border border-slate-600 shadow-inner">
+                  <div 
+                    className="h-12 rounded-full flex items-center justify-end pr-4 text-base font-bold text-white transition-all duration-500 ease-out"
+                    style={{ 
+                      width: `${(item.probability / maxProbability) * 100}%`,
+                      background: index === 0 
+                        ? 'linear-gradient(90deg, #10b981 0%, #059669 100%)'
+                        : `linear-gradient(90deg, #3b82f6 0%, #2563eb ${Math.min(100, item.probability * 1000)}%)`
+                    }}
+                  >
+                    {(item.probability * 100).toFixed(2)}%
                   </div>
                 </div>
+                {index === 0 && (
+                  <span className="text-sm font-semibold text-green-400 animate-pulse flex-shrink-0">★ Más probable</span>
+                )}
               </div>
             ))}
           </div>
         </div>
 
-        <div>
-          <h3 className="text-2xl font-bold mb-4 text-white">
-            Distribución de probabilidades:
-          </h3>
-          <div className="bg-[#1f1f23] border border-gray-600 rounded-lg p-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-red-400">
-                  {formatProbability(processData.probabilities[0]?.probability || 0)}%
+    <div className="space-y-6">
+      <div className="bg-gradient-to-br from-slate-900/60 to-slate-800/40 rounded-2xl border border-slate-700 p-6 shadow-xl">
+                <h3 className="text-xl font-bold mb-4 text-slate-200">Contexto Actual</h3>
+                <div className="flex flex-wrap gap-2 p-4 bg-slate-900/50 rounded-xl border border-slate-700">
+        {processData.tokens.map((token, index) => (
+          <span key={index} className="px-3 py-2 bg-slate-700 text-slate-100 rounded-lg font-mono text-sm">
+          {token === ' ' ? '␣' : token}
+          </span>
+        ))}
+                <span className="px-3 py-2 bg-blue-500/30 text-blue-300 rounded-lg font-bold text-sm animate-pulse border-2 border-blue-500/50">
+                  <span className="inline-block animate-bounce">?</span>
+                </span>
                 </div>
-                <div className="text-gray-300">Más probable</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-yellow-400">
-                  {processData.probabilities.slice(0, 3).reduce((sum, item) => sum + item.probability, 0).toFixed(2)}
-                </div>
-                <div className="text-gray-300">Top 3 acumulado</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-blue-400">
-                  {processData.probabilities.slice(0, 10).reduce((sum, item) => sum + item.probability, 0).toFixed(2)}
-                </div>
-                <div className="text-gray-300">Top 10 acumulado</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-green-400">
-                  {processData.vocabulary.length}
-                </div>
-                <div className="text-gray-300">Vocabulario total</div>
-              </div>
             </div>
-            
-            <div className="text-center text-gray-300">
-              El modelo considera <span className="font-bold text-white">
-                {processData.vocabulary.length} tokens posibles
-              </span> del vocabulario para la predicción.
-            </div>
-          </div>
+            {isExplanationMode && (
+                <div className="p-6 bg-gradient-to-br from-amber-950/30 to-slate-900/50 rounded-2xl border-2 border-amber-700/30">
+                    <h4 className="font-bold text-xl text-amber-300 mb-3 flex items-center gap-2">
+                      <span>📊</span> ¿Cómo Decide el Modelo?
+                    </h4>
+                    <div className="space-y-3 text-slate-300 text-sm">
+                      <p>
+                        🎯 <strong>El proceso es simple:</strong> El modelo toma toda la información que procesó (las palabras con su significado y posición) 
+                        y la compara con todas las palabras que conoce. Es como tener un examen de opción múltiple: el modelo le da una &quot;nota&quot; 
+                        a cada posible palabra, y luego convierte esas notas en porcentajes usando una fórmula llamada <strong className="text-amber-400">softmax</strong>.
+                      </p>
+                      <div className="bg-slate-900/50 rounded-lg p-4">
+                        <p className="font-mono text-sm text-center mb-3">P(token<sub>i</sub>) = exp(z<sub>i</sub>) / Σ<sub>j</sub> exp(z<sub>j</sub>)</p>
+                        <div className="text-xs text-slate-400 space-y-1 pl-3 border-l-2 border-amber-500/50">
+                          <p>🎯 <strong className="text-amber-400">P(token<sub>i</sub>)</strong> = ¿Qué tan probable es esta palabra? (de 0% a 100%)</p>
+                          <p>📝 <strong className="text-amber-400">z<sub>i</sub></strong> = la &quot;nota&quot; inicial de esta palabra</p>
+                          <p>📈 <strong className="text-amber-400">exp()</strong> = una función matemática que hace las diferencias más claras</p>
+                          <p>➕ <strong className="text-amber-400">Σ<sub>j</sub></strong> = suma las notas de TODAS las palabras posibles</p>
+                        </div>
+                      </div>
+                      <p>
+                        ✨ <strong>El truco:</strong> Dividir cada nota por la suma total hace que todos los porcentajes sumen exactamente 100%. 
+                        La palabra con el porcentaje más alto es la que el modelo cree que debería ir después. ¡En modelos grandes como GPT-4, 
+                        esto se hace con vocabularios de ¡más de 50,000 palabras!
+                      </p>
+                    </div>
+                </div>
+            )}
         </div>
+      </div>
 
-        {isExplanationMode && (
-          <div className="bg-[#1f1f23] border border-gray-600 rounded-lg p-6">
-            <h4 className="text-xl font-bold mb-4 text-white">
-              🔍 ¿Cómo se calculan las probabilidades?
-            </h4>
-            <div className="space-y-3 text-gray-300">
-              <p>
-                <strong>1. Proyección:</strong> El último vector del contexto se proyecta 
-                a un espacio del tamaño del vocabulario (una dimensión por token posible).
-              </p>
-              <p>
-                <strong>2. Logits:</strong> Se obtienen valores &ldquo;crudos&rdquo; (logits) 
-                que indican la preferencia del modelo por cada token.
-              </p>
-              <p>
-                <strong>3. Softmax:</strong> Los logits se convierten en probabilidades 
-                que suman 100%, favoreciendo los valores más altos.
-              </p>
-              <p>
-                <strong>4. Selección:</strong> En el siguiente paso, el modelo elegirá 
-                un token basándose en estas probabilidades.
-              </p>
-            </div>
-          </div>
-        )}
-
-        <div className="bg-[#0d1f0d] border border-green-600 rounded-lg p-4">
-          <div className="flex items-center gap-3">
-            <div className="text-green-400 text-2xl">✓</div>
-            <div>
-              <div className="text-green-400 font-bold text-lg">Probabilidades calculadas</div>
-              <div className="text-green-300">
-                {processData.vocabulary.length} tokens evaluados • 
-                Top 10 candidatos identificados • 
-                Token más probable: &ldquo;{processData.probabilities[0]?.token}&rdquo; 
-                ({formatProbability(processData.probabilities[0]?.probability || 0)}%)
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="text-center mt-8">
+        <button className="navigation-button px-8 py-3" onClick={() => onNext ? onNext() : null}>
+          <span>Siguiente: Generación Autoregresiva</span>
+          <span>→</span>
+        </button>
       </div>
     </div>
   );
