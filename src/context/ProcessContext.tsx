@@ -6,14 +6,14 @@ import { ProcessData } from '../types';
 import { generateEmbedding, generatePositionalEncoding, addVectors, computeMultiHeadAttention, generateVocabulary, computeProbabilities, sampleNextToken, runLLMStep } from '../utils/llm-simulation';
 
 // 1. Definir el estado y las acciones
-interface AppState {
+export interface AppState {
   currentStep: number;
   inputText: string;
   isExplanationMode: boolean;
   processData: ProcessData | null;
 }
 
-type Action =
+export type Action =
   | { type: 'START_PROCESS'; payload: { text: string } }
   | { type: 'SET_STEP'; payload: number }
   | { type: 'RESTART' }
@@ -125,7 +125,7 @@ export function appReducer(state: AppState, action: Action): AppState {
       const probs = state.processData.probabilities || [];
       if (!probs.length) return state;
 
-      const nextToken = typeof strategy === 'number' ? sampleNextToken(probs, strategy) : sampleNextToken(probs, strategy as any, k);
+  const nextToken = typeof strategy === 'number' ? sampleNextToken(probs, strategy) : sampleNextToken(probs, strategy as 'greedy' | 'random' | 'top-k', k);
       const newText = (state.processData.originalText || '') + ' ' + nextToken;
       const updated = runLLMStep(state.processData, newText);
 
@@ -151,18 +151,18 @@ export function ProcessProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const toPersist: Partial<AppState> = {
+  const toPersist: unknown = {
       currentStep: state.currentStep,
       inputText: state.inputText,
       isExplanationMode: state.isExplanationMode,
-      processData: state.processData
-        ? {
+        processData: state.processData
+        ? ({
             originalText: state.processData.originalText,
             tokens: state.processData.tokens,
             tokenIds: state.processData.tokenIds,
             generatedTokens: state.processData.generatedTokens,
             vocabulary: state.processData.vocabulary,
-          } as any
+          } as unknown as Partial<ProcessData>)
         : null,
     };
 

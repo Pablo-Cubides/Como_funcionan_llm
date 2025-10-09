@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { appReducer, initialState } from '../ProcessContext';
+import { appReducer, initialState, Action } from '../ProcessContext';
 
 describe('appReducer COMPUTE_EMBEDDINGS', () => {
   it('computes embeddings and positional encodings and stores them', () => {
@@ -25,7 +25,8 @@ describe('appReducer COMPUTE_EMBEDDINGS', () => {
       },
     };
 
-    const next = appReducer(startState as any, { type: 'COMPUTE_EMBEDDINGS', payload: { tokenIds, tokens } } as any);
+  const action: Action = { type: 'COMPUTE_EMBEDDINGS', payload: { tokenIds, tokens } } as unknown as Action;
+  const next = appReducer(startState as unknown as import('../ProcessContext').AppState, action);
 
     expect(next.processData).toBeTruthy();
     expect(next.processData?.embeddings.length).toBe(3);
@@ -59,7 +60,7 @@ describe('appReducer COMPUTE_ATTENTION and PROBABILITIES', () => {
       },
     };
 
-    const afterAttention = appReducer(startState as any, { type: 'COMPUTE_ATTENTION' } as any);
+  const afterAttention = appReducer(startState as unknown as import('../ProcessContext').AppState, { type: 'COMPUTE_ATTENTION' } as Action);
     expect(afterAttention.processData?.attentionHeads.length).toBeGreaterThan(0);
     expect(afterAttention.processData?.attentionWeights.length).toBeGreaterThan(0);
   });
@@ -86,7 +87,7 @@ describe('appReducer COMPUTE_ATTENTION and PROBABILITIES', () => {
       },
     };
 
-    const afterProbs = appReducer(startState as any, { type: 'COMPUTE_PROBABILITIES' } as any);
+  const afterProbs = appReducer(startState as unknown as import('../ProcessContext').AppState, { type: 'COMPUTE_PROBABILITIES' } as Action);
     expect(afterProbs.processData?.probabilities.length).toBeGreaterThan(0);
     expect(afterProbs.processData?.vocabulary.length).toBeGreaterThan(0);
   });

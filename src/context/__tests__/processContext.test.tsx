@@ -20,18 +20,20 @@ describe('ProcessContext persistence', () => {
   beforeEach(() => {
     // mock localStorage with spies
     let store: Record<string, string> = {};
-    const setItemSpy = vi.fn((k: string, v: string) => { store[k] = v; });
-    const mock = {
+  const setItemImpl = (k: string, v: string) => { store[k] = v; };
+  const setItemSpy = vi.fn(setItemImpl);
+    const mock: Partial<Storage> = {
       getItem: (k: string) => store[k] ?? null,
-      setItem: setItemSpy,
+      setItem: setItemSpy as unknown as (k: string, v: string) => void,
       removeItem: (k: string) => { delete store[k]; },
       clear: () => { store = {}; },
-    } as any;
-  global.localStorage = mock as unknown as Storage;
+    };
+  global.localStorage = mock as Storage;
     // expose spy for assertions
   // expose spy for assertions
   // attach spy for assertions on global (test-only helper)
-  (global as any).__setItemSpy = setItemSpy;
+  // attach spy for assertions on global (test-only helper)
+  (global as unknown as { __setItemSpy?: typeof setItemSpy }).__setItemSpy = setItemSpy;
   });
 
   afterEach(() => {
@@ -55,10 +57,10 @@ describe('ProcessContext persistence', () => {
     await new Promise((res) => setTimeout(res, 350));
 
   // assert localStorage.setItem was called with expected payload
-  const spy = (global as any).__setItemSpy as ReturnType<typeof vi.fn>;
-  expect(spy).toHaveBeenCalled();
+  const spy = (global as unknown as { __setItemSpy?: ReturnType<typeof vi.fn> }).__setItemSpy as ReturnType<typeof vi.fn> | undefined;
+  expect(spy).toBeDefined();
     // find any call where payload includes our new input
-    const calls = spy.mock.calls.map((c: any[]) => ({ key: c[0], value: JSON.parse(c[1]) }));
+    const calls = (spy!.mock.calls as [string, string][]).map(([key, val]) => ({ key, value: JSON.parse(val) }));
     const match = calls.find(c => c.key === 'exploramodelo_state' && c.value.inputText === 'hola mundo' && c.value.currentStep === 1);
     expect(match).toBeDefined();
   });

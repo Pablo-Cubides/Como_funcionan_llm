@@ -111,10 +111,10 @@ export default function AutoregressiveStep({ onRestart }: AutoregressiveStepProp
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-center bg-slate-900/40 rounded-2xl border border-slate-700 p-6">
             <div className="flex flex-col sm:flex-row items-center gap-3">
                 <label htmlFor="sampling-strategy" className="text-sm font-bold text-slate-300">Estrategia de Muestreo:</label>
-                <select 
-                    id="sampling-strategy"
-                    value={samplingStrategy}
-                    onChange={(e) => handleStrategyChange(e.target.value as any)}
+        <select 
+          id="sampling-strategy"
+          value={samplingStrategy}
+          onChange={(e) => handleStrategyChange(e.target.value as 'greedy' | 'random' | 'top-k')}
                     className="bg-slate-800 text-white text-base font-medium rounded-xl px-4 py-2.5 border-2 border-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all cursor-pointer">
                     <option value="greedy">🎯 Greedy (el más probable)</option>
                     <option value="random">🎲 Random (aleatorio)</option>
