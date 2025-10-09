@@ -21,167 +21,237 @@ ExploraModelo es una aplicación web educativa que explica cómo funcionan los m
 ## 🛠️ Tecnologías
 
 - **Frontend**: Next.js 15 (App Router) + TypeScript + TailwindCSS
-- **Backend mínimo**: Next.js API routes para export/logging opcional
-- **Simulación**: Implementación toy de transformers (client-side)
-- **Despliegue**: Compatible con Vercel
+# ExploraModelo — How Large Language Models Work (Educational Demo)
 
-## 🚀 Instalación y uso
-
-### Prerrequisitos
-
-- Node.js 18+ 
-- npm o yarn
-
-### Desarrollo local
-
-```bash
-# Instalar dependencias
-npm install
-
-# Ejecutar en modo desarrollo
-npm run dev
-
-# Abrir http://localhost:3000
-```
-
-### Construcción para producción
-
-```bash
-# Construir la aplicación
-npm run build
-
-# Iniciar servidor de producción
-npm start
-```
-
-### Despliegue en Vercel
-
-1. Fork este repositorio
-2. Conectar con Vercel
-3. Desplegar automáticamente
-
-## 📚 Uso de la aplicación
-
-### Paso 1: Entrada de texto
-- Escribir una frase personalizada (máx. 200 caracteres)
-- O seleccionar uno de los 10 ejemplos precargados
-- Hacer clic en "Comenzar análisis"
-
-### Paso 2: Tokenización
-- Ver cómo el texto se divide en tokens
-- Observar la asignación de IDs numéricos únicos
-- Entender la conversión texto → números
-
-### Paso 3: Vectorización
-- Visualizar embeddings como barras de colores
-- Ver la codificación posicional sinusoidal
-- Entender la combinación embedding + posición
-
-### Paso 4: Atención
-- Explorar la matriz de atención interactiva
-- Hacer hover sobre celdas para ver detalles
-- Entender la máscara causal (no mirar al futuro)
-
-### Paso 5: Probabilidades
-- Ver las probabilidades del siguiente token
-- Explorar el top 10 de candidatos
-- Entender la distribución softmax
-
-### Paso 6: Generación autoregresiva
-- Generar hasta 3 tokens nuevos
-- Ver el proceso iterativo paso a paso
-- Entender el bucle de generación
-
-## 🎨 Características visuales
-
-### Tema oscuro proyector-friendly
-- Fondo: `#0b0b0f` (negro profundo)
-- Texto: `#ffffff` (blanco puro)
-- Acento: `#dc2626` (rojo)
-- Fuentes grandes (18px base)
-- Alto contraste en todos los elementos
-
-### Componentes interactivos
-- **TokenChips**: Tokens con colores alternados
-- **EmbeddingBars**: Vectores como barras de color
-- **AttentionHeatmap**: Matriz de atención con hover
-- **ProbabilityBars**: Barras de probabilidad animadas
-- **ProgressStepper**: Navegación entre pasos
-
-### Modo explicación
-- Textos didácticos detallados
-- Tooltips informativos
-- Ejemplos contextuales
-- Explicaciones paso a paso
-
-## 🔧 API Endpoints (opcional)
-
-### POST /api/export
-Endpoint para exportar el estado actual (implementación mínima)
-
-```javascript
-{
-  "htmlContent": "<html>...</html>",
-  "format": "PNG" | "PDF"
-}
-```
-
-### POST /api/log
-Logging de uso sin datos personales
-
-```javascript
-{
-  "demoUsed": "Los pájaros vuelan...",
-  "stepsCompleted": 5,
-  "sessionId": "anonymous"
-}
-```
-
-### GET /api/log
-Estadísticas básicas de uso
-
-## 📖 Aspectos educativos
-
-### Conceptos explicados
-1. **Tokenización**: Cómo se divide el texto en unidades procesables
-2. **Embeddings**: Representación vectorial del significado
-3. **Posición**: Importancia del orden en el texto
-4. **Atención**: Cómo el modelo "enfoca" información relevante
-5. **Softmax**: Conversión de logits a probabilidades
-6. **Autoregresión**: Generación iterativa token por token
-
-### Público objetivo
-- Estudiantes de IA/ML
-- Desarrolladores curiosos sobre LLMs
-- Educadores en tecnología
-- Cualquier persona interesada en entender cómo funcionan los modelos de lenguaje
-
-## 🎯 Limitaciones intencionales
-
-- **No sampling**: No implementa temperature/top-k/top-p
-- **Modelo toy**: Simplificado para propósitos educativos
-- **Vocabulario pequeño**: ~200 tokens en español
-- **Generación limitada**: Máximo 3 tokens nuevos
-- **Sin persistencia**: Los datos se resetean al recargar
-
-## 🤝 Contribuir
-
-1. Fork el proyecto
-2. Crear una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abrir un Pull Request
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT. Ver `LICENSE` para más detalles.
-
-## 🙏 Agradecimientos
-
-- Inspirado en el paper "Attention Is All You Need" (Vaswani et al., 2017)
-- Diseñado para ser accesible y educativo
-- Optimizado para presentaciones y enseñanza
+ExploraModelo is a single-page educational web application that explains, step-by-step, how transformer-based language models process text: from tokenization, embeddings and positional encoding, through self-attention and softmax probabilities, to autoregressive generation. It is intentionally a "toy" model for teaching core concepts without external APIs or private data.
 
 ---
 
-**ExploraModelo** - Haciendo los LLMs comprensibles, un paso a la vez. 🚀
+## Table of contents
+
+- Project summary
+- Technical highlights (what recruiters look for)
+- Architecture and data flow
+- API contracts
+- Local development
+- Production deployment
+- Testing and CI
+- Security, privacy, and accessibility
+- Performance and scaling notes
+- Extensibility and next steps
+- File structure
+- License
+
+---
+
+## Project summary
+
+ExploraModelo demonstrates the internal steps of a transformer-style LLM with an emphasis on pedagogy and reproducibility. It is built with Next.js (App Router), TypeScript and client-side simulation of transformer internals to keep the demo self-contained and safe for classroom or conference use.
+
+Key features
+- Single-page flow with 6 interactive steps: Entrada, Tokenización, Embeddings, Atención, Probabilidades, Generación.
+- Deterministic, client-side LLM simulation (token hashing, fixed-size embeddings, sinusoidal positional encodings, toy multi-head self-attention, softmax probabilities, sampling strategies).
+- Visualizations: token chips, embedding tiles, attention heatmaps, probability bars and generation timeline.
+- Accessibility-first styling (high contrast theme, large fonts) optimized for projector display.
+- Minimal server API routes for export and anonymous usage logging compatible with serverless platforms.
+
+
+## Technical highlights (recruiter-oriented)
+
+This project showcases experience across frontend engineering, systems design and applied ML concepts. Recruiters should note:
+
+- Modern React architecture: Next.js App Router with server/client components and well-typed TypeScript context/reducer patterns (useReducer + Context API) for predictable state transitions.
+- UI/UX: Accessible, responsive design using a single global CSS theme, clear componentization (InputStep, TokenizationStep, EmbeddingStep, AttentionStep, ProbabilityStep, AutoregressiveStep) and progressive disclosure for educational content.
+- Deterministic simulation: Reproducible embedding and attention generation using seeded hashing and mathematical transforms — demonstrates an understanding of linear algebra primitives used in ML models.
+- Testing & Quality: Unit tests with Vitest and @testing-library; CI workflow included to ensure build/test/lint on PRs.
+- Observability & Privacy: Minimal server-side logging with privacy-aware truncation (no PII stored by default), and API endpoints designed for lightweight analytics and optional export.
+- Deployment-ready: Compatible with Vercel (serverless functions) and standard Node hosting. Configured for production build and basic CI.
+
+Skills demonstrated
+- TypeScript, React, Next.js, CSS architecture, testing (Vitest), Git workflows, basic security/privacy best-practices, and pedagogical communication of ML concepts.
+
+
+## Architecture and data flow
+
+Overview (high level): user input → tokenizer → embeddings (+ positional encodings) → multi-head self-attention → softmax probabilities → autoregressive generation.
+
+Sequence diagram (simplified):
+
+User -> InputStep: text
+InputStep -> ProcessContext: START_PROCESS
+ProcessContext -> Tokenizer: tokenize(text)
+Tokenizer -> State: tokens, tokenIds
+State -> Embeddings module: generateEmbedding(tokenId) & generatePositionalEncoding(position)
+Embeddings -> State: embeddings, positionalEncodings, combinedEmbeddings
+State -> Attention module: computeMultiHeadAttention(combinedEmbeddings)
+Attention -> State: attentionHeads, attentionWeights
+State -> Probabilities module: computeProbabilities(lastEmbedding, vocabulary)
+Probabilities -> State: probabilities
+State -> Autoregressive: sampleNextToken/proceed (repeat)
+
+
+Component responsibilities
+- InputStep: Accepts text input or demo selection, shows token limit and starts the pipeline.
+- TokenizationStep: Visualizes tokens and their numeric IDs.
+- EmbeddingStep: Shows semantic embeddings, positional encodings and combined vectors (per-token selector available).
+- AttentionStep: Shows multi-head attention matrices, head selector and causal mask explanation.
+- ProbabilityStep: Renders the softmax distribution (top-k candidates) and allows sampling strategies.
+- AutoregressiveStep: Demonstrates stepwise generation of up to 3 tokens with history and explanation.
+
+
+## API contracts
+
+Two minimal server routes live under `src/app/api` (Next.js route handlers). They are intentionally simple and safe for demo deployment.
+
+POST /api/export
+- Request JSON: { htmlContent: string, format?: 'PNG' | 'PDF' }
+- Response: { success: boolean, message: string, recommendation?: string }
+- Notes: This route does not generate a file server-side. The recommended approach is client-side `html2canvas` + `jsPDF` for export in static deployments. Server-side PDF generation requires headless Chromium and additional infra.
+
+POST /api/log
+- Request JSON: { demoUsed: string, stepsCompleted?: number, sessionId?: string }
+- Response: { success: boolean, message: string, totalLogs?: number }
+- Notes: Logs are kept in-memory for the demo. For production switch to a persistent store with retention policies. Ensure consent and anonymization.
+
+GET /api/log
+- Response: { totalSessions: number, averageStepsCompleted: number, lastActivity?: string }
+
+
+## Local development
+
+Prerequisites
+- Node.js 18+ (LTS recommended)
+- npm
+
+Quick start
+
+```powershell
+npm install
+npm run dev
+# open http://localhost:3000
+```
+
+Build & run production locally
+
+```powershell
+npm run build
+npm start
+```
+
+Run tests
+
+```powershell
+npm test
+```
+
+Lint (ESLint)
+
+```powershell
+npm run lint
+```
+
+
+## CI / GitHub Actions
+
+A CI workflow is included at `.github/workflows/ci.yml` which runs on PRs and pushes to main. It executes:
+- npm ci
+- npm run lint
+- npm test
+- npm run build
+
+This demonstrates familiarity with standard CI gates required by many engineering teams and recruiters.
+
+
+## Security, privacy and compliance notes
+
+- No external LLM APIs: the demo runs purely client-side and does not send user text to third parties.
+- Logging: `/api/log` truncates demo text and stores minimal metadata. For production use, sanitize inputs and store only hashed or consented data.
+- Rate limiting: Add rate-limiting (server or edge) before exposing endpoints publicly.
+- Vulnerability scanning: Run `npm audit` and include automated dependency scanning in CI for production readiness.
+
+
+## Accessibility
+
+- High contrast dark theme, large base font (18px) and clear layout.
+- Recommended improvements before wide accessibility audits: add ARIA roles, ensure focus management on step changes and run axe/pa11y checks.
+
+
+## Performance & scaling
+
+- Complexity: Attention computation in the toy model is O(seq^2). For longer sequences, move heavy computations to a Web Worker or limit the input length.
+- Bundling: Keep third-party libraries minimal to reduce JS payload for classroom/embedded usage.
+- Serverless readiness: The API routes are compatible with serverless platforms (Vercel). Avoid long-running CPU tasks in serverless functions.
+
+
+## Extensibility & next iterations
+
+Possible improvements (ranked):
+1. WebWorker offload for attention & embedding computation (smooth UI for longer sequences).
+2. Real export generation server-side (headless Chromium) or fully client-side html2canvas+jsPDF.
+3. Add E2E Playwright tests that simulate the full user flow for regression protection.
+4. Replace toy embeddings with a tiny WASM-backed vector library for more realistic visuals.
+5. Add telemetry and anonymized usage analytics + consent screen.
+
+
+## File structure (high level)
+
+```
+src/
+  app/
+    api/
+      export/route.ts
+      log/route.ts
+    components/
+      InputStep.tsx
+      TokenizationStep.tsx
+      EmbeddingStep.tsx
+      AttentionStep.tsx
+      ProbabilityStep.tsx
+      AutoregressiveStep.tsx
+      Stepper.tsx
+    globals.css
+    page.tsx
+  context/
+    ProcessContext.tsx
+  utils/
+    llm-simulation.ts
+    analytics.ts
+  types/
+    index.ts
+
+README.md
+package.json
+.vscode/*
+.github/workflows/ci.yml
+```
+
+
+## How to evaluate candidate experience
+
+If you're a recruiter reviewing this repo, look for:
+- Clear, typed React code and simple, well-isolated components.
+- Tests covering core logic (tokenize, embedding generation, probability sampling).
+- Thoughtful trade-offs: why client-side simulation, why limit inputs, how privacy is handled.
+- CI that enforces tests/lint/build.
+- README and docs that explain architecture and reasoning (this file).
+
+Suggested interview topics
+- Explain how tokenization maps to embedding indices.
+- Walk through the self-attention computation and justify the softmax step.
+- Discuss scaling strategies for longer sequences and where to offload computation.
+- Propose how you'd productionize logging and telemetry while preserving privacy.
+
+
+## License
+
+MIT
+
+
+---
+
+If you want, puedo:
+- Añadir diagramas SVG/PNG al README (arquitectura y secuencia).
+- Generar Playwright E2E tests y añadirlos a CI.
+- Implementar WebWorker para offload de cómputo.
+
+Dime qué prefieres y lo agrego al repo.
