@@ -17,6 +17,12 @@ jobs:
           node-version: 20
       - name: Install dependencies
         run: npm ci
+      - name: Verify package.json scripts
+        run: |
+          echo "=== Checking package.json scripts ==="
+          cat package.json | grep -A 10 "scripts"
+          echo "=== Available npm scripts ==="
+          npm run
       - name: Lint
         run: npm run lint
       - name: Build
