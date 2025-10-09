@@ -6,9 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-  "lint": "eslint \"**/*.{js,cjs,mjs,ts,tsx}\"",
-  "lint:ci": "eslint \"src/**/*.{ts,tsx}\" --max-warnings=0",
-  "test": "vitest --run --globals"
+    "lint": "eslint \"**/*.{js,cjs,mjs,ts,tsx}\"",
+    "lint:ci": "eslint \"src/**/*.{ts,tsx}\" --max-warnings=0",
+    "test": "vitest --run --globals",
+    "test:unit": "vitest --run --globals"
   },
   "dependencies": {
     "react": "^18.2.0",
