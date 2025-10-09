@@ -56,7 +56,7 @@ Key features
 - Minimal server API routes for export and anonymous usage logging compatible with serverless platforms.
 
 
-## Technical highlights (recruiter-oriented)
+## Technical highlights
 
 This project showcases experience across frontend engineering, systems design and applied ML concepts. Recruiters should note:
 
