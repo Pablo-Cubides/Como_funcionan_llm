@@ -1,9 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { computeMultiHeadAttention } from '../../utils/llm-simulation';
 import { useProcess } from '../../context/ProcessContext';
-import { AttentionHead } from '../../types';
 
 interface AttentionStepProps { onNext?: () => void }
 export default function AttentionStep({ onNext }: AttentionStepProps) {
@@ -15,14 +13,7 @@ export default function AttentionStep({ onNext }: AttentionStepProps) {
     // snapshot embeddings to a stable reference for hook dependencies
     const embeddingsSnapshot = useMemo(() => processData?.combinedEmbeddings ?? null, [processData?.combinedEmbeddings]);
 
-    // create a stable key for dependency based on length and first/last values to avoid deep equality
-    const combinedKey = useMemo(() => {
-      const arr = embeddingsSnapshot;
-      if (!arr) return '';
-      const first = arr[0]?.slice?.(0, 2) ?? [];
-      const last = arr[arr.length - 1]?.slice?.(-2) ?? [];
-      return `${arr.length}:${first.join(',')}:${last.join(',')}`;
-    }, [embeddingsSnapshot]);
+    // (combinedKey removed) embeddingsSnapshot is used for effect dependencies
 
     useEffect(() => {
       if (embeddingsSnapshot && processData && !processData.attentionHeads?.length) {

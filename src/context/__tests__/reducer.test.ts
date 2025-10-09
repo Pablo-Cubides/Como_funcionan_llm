@@ -38,7 +38,7 @@ describe('appReducer COMPUTE_EMBEDDINGS', () => {
 
 describe('appReducer COMPUTE_ATTENTION and PROBABILITIES', () => {
   it('computes attention heads and combined weights', () => {
-    const tokenIds = [1, 2, 3, 4];
+  const tokenIds = [1, 2, 3, 4];
     const tokens = ['a', 'b', 'c', 'd'];
     const startState = {
       ...initialState,
@@ -46,9 +46,9 @@ describe('appReducer COMPUTE_ATTENTION and PROBABILITIES', () => {
         originalText: 'a b c d',
         tokens,
         tokenIds,
-        embeddings: tokenIds.map(id => Array(16).fill(0)),
-        positionalEncodings: tokenIds.map(_ => Array(16).fill(0)),
-        combinedEmbeddings: tokenIds.map(_ => Array(16).fill(0)),
+          embeddings: tokenIds.map(_id => Array(16).fill(0)),
+          positionalEncodings: tokenIds.map(_id => Array(16).fill(0)),
+          combinedEmbeddings: tokenIds.map(_id => Array(16).fill(0)),
         attentionHeads: [],
         attentionWeights: [],
         attentionScores: [],
@@ -73,9 +73,9 @@ describe('appReducer COMPUTE_ATTENTION and PROBABILITIES', () => {
         originalText: 'x y',
         tokens,
         tokenIds,
-        embeddings: tokenIds.map(_ => Array(16).fill(0)),
-        positionalEncodings: tokenIds.map(_ => Array(16).fill(0)),
-        combinedEmbeddings: tokenIds.map(_ => Array(16).fill(0)),
+          embeddings: tokenIds.map(_id => Array(16).fill(0)),
+          positionalEncodings: tokenIds.map(_id => Array(16).fill(0)),
+          combinedEmbeddings: tokenIds.map(_id => Array(16).fill(0)),
         attentionHeads: [],
         attentionWeights: [],
         attentionScores: [],

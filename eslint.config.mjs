@@ -18,12 +18,15 @@ export default [
   // Basic language and environment settings so ESLint can run safely
   {
     languageOptions: {
+      // Use the TypeScript parser so .ts/.tsx files are parsed correctly
+      parser: '@typescript-eslint/parser',
       ecmaVersion: 2024,
       sourceType: 'module',
       parserOptions: {
         ecmaVersion: 2024,
         sourceType: 'module',
         project: './tsconfig.json',
+        tsconfigRootDir: process.cwd(),
       },
     },
     env: {
@@ -31,8 +34,38 @@ export default [
       node: true,
       es2024: true,
     },
+    // Declare common test globals to avoid `no-undef` on Vitest/Jest-style tests
+    globals: {
+      describe: 'readonly',
+      it: 'readonly',
+      test: 'readonly',
+      expect: 'readonly',
+      beforeEach: 'readonly',
+      afterEach: 'readonly',
+      vi: 'readonly',
+    },
     rules: {
       // Keep defaults; project can opt in to stricter rules later
+    },
+  },
+  // Provide an override specifically for test files (if you prefer stricter/looser rules there)
+  {
+    files: ["**/__tests__/**", "**/*.test.*", "**/*.spec.*"],
+    languageOptions: {
+      parser: '@typescript-eslint/parser',
+      parserOptions: {
+        project: './tsconfig.json',
+        tsconfigRootDir: process.cwd(),
+      },
+    },
+    globals: {
+      describe: 'readonly',
+      it: 'readonly',
+      test: 'readonly',
+      expect: 'readonly',
+      beforeEach: 'readonly',
+      afterEach: 'readonly',
+      vi: 'readonly',
     },
   },
 ];

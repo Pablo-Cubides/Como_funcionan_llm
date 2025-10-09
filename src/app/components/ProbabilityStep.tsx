@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo } from 'react';
-import { computeProbabilities, generateVocabulary } from '../../utils/llm-simulation';
 import { useProcess } from '../../context/ProcessContext';
 
 interface ProbabilityStepProps { onNext?: () => void }

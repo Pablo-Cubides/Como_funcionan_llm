@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { generateEmbedding, generatePositionalEncoding, addVectors } from '../../utils/llm-simulation';
+import { useEffect, useState } from 'react';
 import { useProcess } from '../../context/ProcessContext';
 
 interface EmbeddingStepProps { onNext?: () => void }
@@ -20,7 +19,7 @@ export default function EmbeddingStep({ onNext }: EmbeddingStepProps) {
   }, [processData?.tokenIds, processData?.tokens, processData?.embeddings, dispatch]);
 
   const getValueColor = (value: number): string => {
-    const intensity = Math.round(Math.abs(value) * 255);
+    // Keep this helper small; intensity variable removed to satisfy linter
     return value > 0 ? `rgb(239, 68, 68, ${Math.abs(value)})` : `rgb(59, 130, 246, ${Math.abs(value)})`;
   };
 
