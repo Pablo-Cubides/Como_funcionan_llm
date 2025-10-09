@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+  "lint": "eslint . --ext .js,.ts,.tsx",
+  "lint:ci": "eslint src --ext .ts,.tsx --max-warnings=0",
   "test": "vitest --run --globals"
   },
   "dependencies": {
@@ -24,6 +25,8 @@
     "eslint": "^8.0.0",
     "eslint-config-next": "14.2.3",
     "@eslint/eslintrc": "^3",
+    "@typescript-eslint/parser": "^6.6.0",
+    "@typescript-eslint/eslint-plugin": "^6.6.0",
     "vitest": "^1.0.0",
     "@testing-library/react": "^14.0.0",
     "@testing-library/jest-dom": "^6.0.0",

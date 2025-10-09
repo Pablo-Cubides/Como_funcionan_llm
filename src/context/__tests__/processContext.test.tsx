@@ -27,16 +27,15 @@ describe('ProcessContext persistence', () => {
       removeItem: (k: string) => { delete store[k]; },
       clear: () => { store = {}; },
     } as any;
-    // @ts-ignore
-    global.localStorage = mock;
+  global.localStorage = mock as unknown as Storage;
     // expose spy for assertions
-    // @ts-ignore
-    global.__setItemSpy = setItemSpy;
+  // expose spy for assertions
+  // attach spy for assertions on global (test-only helper)
+  (global as any).__setItemSpy = setItemSpy;
   });
 
   afterEach(() => {
-    // @ts-ignore
-    global.localStorage = originalLS;
+  global.localStorage = originalLS;
   });
 
   it('persists state after starting process', async () => {
@@ -56,8 +55,7 @@ describe('ProcessContext persistence', () => {
     await new Promise((res) => setTimeout(res, 350));
 
   // assert localStorage.setItem was called with expected payload
-  // @ts-ignore
-  const spy = global.__setItemSpy as ReturnType<typeof vi.fn>;
+  const spy = (global as any).__setItemSpy as ReturnType<typeof vi.fn>;
   expect(spy).toHaveBeenCalled();
     // find any call where payload includes our new input
     const calls = spy.mock.calls.map((c: any[]) => ({ key: c[0], value: JSON.parse(c[1]) }));

@@ -15,7 +15,7 @@ export function hashToken(token: string): number {
 export function tokenize(text: string): string[] {
   return text
     .toLowerCase()
-    .split(/(\s+|[.,!?;:()"\-])/)
+    .split(/(\s+|[.,!?;:()"-])/) 
     .filter(token => token.trim().length > 0);
 }
 
