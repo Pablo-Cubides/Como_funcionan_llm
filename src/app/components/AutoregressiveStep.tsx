@@ -4,9 +4,12 @@ import { useState, useRef, useEffect } from 'react';
 import { useProcess } from '../../context/ProcessContext';
 import { logEvent } from '../../utils/analytics';
 
-interface AutoregressiveStepProps { onRestart?: () => void }
+interface AutoregressiveStepProps { 
+  onRestart?: () => void;
+  onNext?: () => void;
+}
 
-export default function AutoregressiveStep({ onRestart }: AutoregressiveStepProps) {
+export default function AutoregressiveStep({ onRestart, onNext }: AutoregressiveStepProps) {
   const { state, dispatch } = useProcess();
   const { processData, isExplanationMode } = state;
   const [isGenerating, setIsGenerating] = useState(false);
@@ -69,156 +72,187 @@ export default function AutoregressiveStep({ onRestart }: AutoregressiveStepProp
 
   return (
     <div className="p-8 sm:p-12 panel">
-      <div className="text-center mb-12">
+      {/* Header */}
+      <div className="text-center mb-16">
         <h2 className="step-title">Paso 5: Generación Autoregresiva</h2>
         {isExplanationMode && (
-          <p className="step-description">
+          <p className="step-description mt-4">
             El modelo añade su predicción al texto de entrada y repite todo el proceso para generar el siguiente token. Este <strong>bucle de retroalimentación</strong> es la base de la generación de texto.
           </p>
         )}
       </div>
 
-  <div className="space-y-8">
-  <div className="bg-gradient-to-br from-slate-900/60 to-slate-800/40 rounded-2xl border border-slate-700 p-8 shadow-xl">
-            <h3 className="text-2xl font-bold mb-6 text-slate-200 flex items-center gap-2">
-              <span>✨</span> Texto en Construcción
-            </h3>
-            <div className="flex flex-wrap gap-3 items-center text-lg p-6 bg-slate-950/50 rounded-xl border border-slate-700 min-h-[120px]">
-                {processData.tokens.slice(0, processData.tokens.length - (processData.generatedTokens?.length || 0)).map((token, index) => (
-                    <span key={index} className="px-4 py-2 bg-slate-700/70 text-slate-200 rounded-lg font-mono shadow-sm">
-                    {token === ' ' ? '␣' : token}
-                    </span>
-                ))}
-                {processData.generatedTokens?.map((token, index) => (
-                    <span 
-                      key={`gen-${index}`} 
-                      className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg font-bold shadow-lg"
-                      style={{
-                        animation: `tokenPop 0.4s ease ${index * 0.1}s`
-                      }}
-                    >
-                    {token}
-                    </span>
-                ))}
-                {canGenerate && (
-                  <span className="px-4 py-2 bg-blue-500/30 text-blue-300 rounded-lg font-bold animate-pulse border-2 border-blue-500/50 shadow-lg">
-                    <span className="inline-block animate-bounce">?</span>
-                  </span>
-                )}
-            </div>
+      <div className="space-y-10">
+        {/* Texto en Construcción */}
+        <div className="bg-gradient-to-br from-slate-900/60 to-slate-800/40 rounded-2xl border border-slate-700 p-8 shadow-xl">
+          <h3 className="text-2xl font-bold mb-6 text-slate-200 flex items-center gap-3">
+            <span className="text-3xl">✨</span> 
+            <span>Texto en Construcción</span>
+          </h3>
+          <div className="flex flex-wrap gap-3 items-center text-lg p-8 bg-slate-950/50 rounded-xl border border-slate-700 min-h-[140px]">
+            {processData.tokens.slice(0, processData.tokens.length - (processData.generatedTokens?.length || 0)).map((token, index) => (
+              <span key={index} className="px-4 py-2.5 bg-slate-700/70 text-slate-200 rounded-lg font-mono shadow-sm transition-transform hover:scale-105">
+                {token === ' ' ? '␣' : token}
+              </span>
+            ))}
+            {processData.generatedTokens?.map((token, index) => (
+              <span 
+                key={`gen-${index}`} 
+                className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg font-bold shadow-lg transform hover:scale-110 transition-transform"
+                style={{
+                  animation: `tokenPop 0.4s ease ${index * 0.1}s`
+                }}
+              >
+                {token}
+              </span>
+            ))}
+            {canGenerate && (
+              <span className="px-5 py-3 bg-blue-500/30 text-blue-300 rounded-lg font-bold animate-pulse border-2 border-blue-500/50 shadow-lg">
+                <span className="inline-block animate-bounce text-2xl">?</span>
+              </span>
+            )}
+          </div>
         </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-center bg-slate-900/40 rounded-2xl border border-slate-700 p-6">
-            <div className="flex flex-col sm:flex-row items-center gap-3">
-                <label htmlFor="sampling-strategy" className="text-sm font-bold text-slate-300">Estrategia de Muestreo:</label>
-        <select 
-          id="sampling-strategy"
-          value={samplingStrategy}
-          onChange={(e) => handleStrategyChange(e.target.value as 'greedy' | 'random' | 'top-k')}
-                    className="bg-slate-800 text-white text-base font-medium rounded-xl px-4 py-2.5 border-2 border-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all cursor-pointer">
-                    <option value="greedy">🎯 Greedy (el más probable)</option>
-                    <option value="random">🎲 Random (aleatorio)</option>
-                    <option value="top-k">🔝 Top-k (top 5)</option>
-                </select>
+        {/* Controles de Generación */}
+        <div className="bg-gradient-to-br from-slate-900/40 to-slate-800/30 rounded-2xl border border-slate-700 p-8 shadow-lg">
+          <div className="flex flex-col gap-6">
+            {/* Selector de Estrategia */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <label htmlFor="sampling-strategy" className="text-lg font-bold text-slate-200">
+                Estrategia de Muestreo:
+              </label>
+              <select 
+                id="sampling-strategy"
+                value={samplingStrategy}
+                onChange={(e) => handleStrategyChange(e.target.value as 'greedy' | 'random' | 'top-k')}
+                className="bg-slate-800 text-white text-lg font-medium rounded-xl px-6 py-3 border-2 border-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all cursor-pointer min-w-[280px]"
+              >
+                <option value="greedy">🎯 Greedy (el más probable)</option>
+                <option value="random">🎲 Random (aleatorio)</option>
+                <option value="top-k">🔝 Top-k (top 5)</option>
+              </select>
             </div>
-            <button 
-              onClick={handleGenerate} 
-              disabled={!canGenerate || isGenerating} 
-              className="navigation-button px-8 py-3"
-            >
+            
+            {/* Botón de Generación */}
+            <div className="flex justify-center">
+              <button 
+                onClick={handleGenerate} 
+                disabled={!canGenerate || isGenerating} 
+                className="navigation-button px-12 py-4 text-xl"
+              >
                 {isGenerating ? (
                   <>
-                    <span className="inline-block animate-spin">⚙️</span>
+                    <span className="inline-block animate-spin text-2xl">⚙️</span>
                     <span>Generando...</span>
                   </>
                 ) : (
                   <>
                     <span>Generar Siguiente Token</span>
-                    <span>→</span>
+                    <span className="text-2xl">→</span>
                   </>
                 )}
-            </button>
-            <button 
-              onClick={handleRestart} 
-              className="px-6 py-3 bg-slate-700 text-slate-200 rounded-xl font-semibold hover:bg-slate-600 transition-all border border-slate-600 hover:border-slate-500"
-            >
-                🔄 Reiniciar
-            </button>
-        </div>
-
-    {generationSteps.length > 0 && (
-      <div className="bg-gradient-to-br from-slate-900/60 to-slate-800/40 rounded-2xl border border-slate-700 p-8 shadow-xl">
-                <h3 className="text-2xl font-bold mb-6 text-slate-200 flex items-center gap-2">
-                  <span>📜</span> Historial de Generación
-                </h3>
-                <div className="space-y-3">
-                {generationSteps.map((step, index) => (
-                    <div 
-                      key={index} 
-                      className="p-5 bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl border border-slate-700 hover:border-emerald-600/50 transition-all"
-                      style={{
-                        animation: `fadeInUp 0.4s ease ${index * 0.1}s backwards`
-                      }}
-                    >
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 text-white font-bold text-sm shadow-lg">
-                            {step.step}
-                          </div>
-                          <p className="font-semibold text-slate-200">
-                            Se añadió <span className="px-2 py-1 bg-emerald-500/80 text-white rounded-lg font-mono text-sm ml-1">{step.addedToken}</span>
-                          </p>
-                        </div>
-                        <p className="text-sm text-slate-400 ml-11 pl-2 border-l-2 border-slate-700">
-                          <strong className="text-slate-300">Resultado:</strong> &quot;{step.fullText}&quot;
-                        </p>
-                    </div>
-                ))}
-                </div>
+              </button>
             </div>
-        )}
-
-    {isExplanationMode && generationSteps.length > 0 && (
-      <div className="p-8 bg-gradient-to-br from-green-950/30 to-slate-900/50 rounded-2xl border-2 border-green-700/30">
-        <h4 className="font-bold text-2xl text-green-300 mb-4 flex items-center gap-2">
-          <span>🔄</span> Bucle Autoregresivo
-        </h4>
-        <div className="space-y-3 text-slate-300 text-sm">
-          <p>
-            La generación autoregresiva es un <strong className="text-green-400">bucle de retroalimentación</strong>:
-          </p>
-          <ol className="list-decimal list-inside space-y-2 pl-4">
-            <li><strong>Predecir:</strong> El modelo calcula probabilidades para el siguiente token</li>
-            <li><strong>Muestrear:</strong> Se selecciona un token según la estrategia elegida</li>
-            <li><strong>Agregar:</strong> El token se añade al contexto</li>
-            <li><strong>Repetir:</strong> Todo el proceso se ejecuta nuevamente con el contexto actualizado</li>
-          </ol>
-          <div className="mt-4 p-4 bg-slate-800/50 rounded-lg">
-            <p className="text-xs text-slate-400">
-              <strong className="text-slate-300">Estrategias de Muestreo:</strong>
-              <br/>• <strong className="text-blue-400">Greedy:</strong> Siempre elige el token más probable (determinista, pero puede ser repetitivo)
-              <br/>• <strong className="text-purple-400">Random:</strong> Escoge aleatoriamente según probabilidades (más diverso)
-              <br/>• <strong className="text-green-400">Top-k:</strong> Limita la selección a los k tokens más probables
-            </p>
           </div>
         </div>
-      </div>
-    )}
 
-        {!canGenerate && (
-            <div className="text-center p-8 bg-gradient-to-br from-emerald-900/50 to-green-900/30 border-2 border-emerald-600 rounded-2xl shadow-2xl">
-                <div className="text-6xl mb-4">🎉</div>
-                <h3 className="text-3xl font-bold text-emerald-300 mb-3">¡Generación Completa!</h3>
-                <p className="text-slate-300 text-lg max-w-2xl mx-auto">
-                  Has visto cómo un LLM construye texto token por token usando el proceso completo: tokenización, embeddings, atención, probabilidades y generación autoregresiva.
-                </p>
-                <button 
-                  onClick={handleRestart}
-                  className="mt-6 navigation-button px-10 py-4"
+        {/* Historial de Generación */}
+        {generationSteps.length > 0 && (
+          <div className="bg-gradient-to-br from-slate-900/60 to-slate-800/40 rounded-2xl border border-slate-700 p-8 shadow-xl">
+            <h3 className="text-2xl font-bold mb-8 text-slate-200 flex items-center gap-3">
+              <span className="text-3xl">📜</span> 
+              <span>Historial de Generación</span>
+            </h3>
+            <div className="space-y-4">
+              {generationSteps.map((step, index) => (
+                <div 
+                  key={index} 
+                  className="p-6 bg-gradient-to-r from-slate-800 to-slate-900 rounded-xl border border-slate-700 hover:border-emerald-600/50 transition-all hover:transform hover:scale-[1.02]"
+                  style={{
+                    animation: `fadeInUp 0.4s ease ${index * 0.1}s backwards`
+                  }}
                 >
-                  <span>🔄</span>
-                  <span>Probar con Otra Frase</span>
-                </button>
+                  <div className="flex items-center gap-4 mb-3">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 text-white font-bold text-base shadow-lg">
+                      {step.step}
+                    </div>
+                    <p className="font-semibold text-slate-200 text-lg">
+                      Se añadió <span className="px-3 py-1.5 bg-emerald-500/80 text-white rounded-lg font-mono text-base ml-2 shadow-md">{step.addedToken}</span>
+                    </p>
+                  </div>
+                  <p className="text-base text-slate-400 ml-14 pl-3 border-l-2 border-slate-700">
+                    <strong className="text-slate-300">Resultado:</strong> &quot;{step.fullText}&quot;
+                  </p>
+                </div>
+              ))}
             </div>
+          </div>
+        )}
+
+        {/* Explicación del Bucle Autoregresivo */}
+        {isExplanationMode && generationSteps.length > 0 && (
+          <div className="p-10 bg-gradient-to-br from-green-950/30 to-slate-900/50 rounded-2xl border-2 border-green-700/30 shadow-xl">
+            <h4 className="font-bold text-3xl text-green-300 mb-6 flex items-center gap-3">
+              <span className="text-4xl">🔄</span> 
+              <span>Bucle Autoregresivo</span>
+            </h4>
+            <div className="space-y-5 text-slate-300">
+              <p className="text-lg leading-relaxed">
+                La generación autoregresiva es un <strong className="text-green-400">bucle de retroalimentación</strong>:
+              </p>
+              <ol className="list-decimal list-inside space-y-3 pl-6 text-base">
+                <li className="leading-relaxed"><strong className="text-green-400">Predecir:</strong> El modelo calcula probabilidades para el siguiente token</li>
+                <li className="leading-relaxed"><strong className="text-green-400">Muestrear:</strong> Se selecciona un token según la estrategia elegida</li>
+                <li className="leading-relaxed"><strong className="text-green-400">Agregar:</strong> El token se añade al contexto</li>
+                <li className="leading-relaxed"><strong className="text-green-400">Repetir:</strong> Todo el proceso se ejecuta nuevamente con el contexto actualizado</li>
+              </ol>
+              <div className="mt-6 p-6 bg-slate-800/50 rounded-xl border border-slate-700">
+                <p className="text-sm text-slate-400 leading-relaxed">
+                  <strong className="text-slate-300 text-base">Estrategias de Muestreo:</strong>
+                  <br/><br/>
+                  • <strong className="text-blue-400">Greedy:</strong> Siempre elige el token más probable (determinista, pero puede ser repetitivo)
+                  <br/><br/>
+                  • <strong className="text-purple-400">Random:</strong> Escoge aleatoriamente según probabilidades (más diverso)
+                  <br/><br/>
+                  • <strong className="text-green-400">Top-k:</strong> Limita la selección a los k tokens más probables
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Mensaje de Completado */}
+        {!canGenerate && (
+          <div className="text-center p-12 bg-gradient-to-br from-emerald-900/50 to-green-900/30 border-2 border-emerald-600 rounded-2xl shadow-2xl">
+            <div className="text-7xl mb-6 animate-bounce">🎉</div>
+            <h3 className="text-4xl font-bold text-emerald-300 mb-5">¡Generación Completa!</h3>
+            <p className="text-slate-300 text-xl max-w-3xl mx-auto mb-10 leading-relaxed">
+              Has visto cómo un LLM construye texto token por token usando el proceso completo: tokenización, embeddings, atención, probabilidades y generación autoregresiva.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+              <button 
+                onClick={handleRestart}
+                className="px-10 py-4 bg-slate-700 text-slate-200 rounded-xl font-bold text-lg hover:bg-slate-600 transition-all border-2 border-slate-600 hover:border-slate-500 flex items-center gap-3 shadow-lg hover:transform hover:scale-105"
+              >
+                <span className="text-2xl">🔄</span>
+                <span>Probar con Otra Frase</span>
+              </button>
+              {onNext && (
+                <button 
+                  onClick={() => {
+                    logEvent('go_to_bibliography');
+                    onNext();
+                  }}
+                  className="navigation-button px-12 py-5 text-xl"
+                >
+                  <span>Explorar Bibliografía</span>
+                  <span className="text-2xl">📚</span>
+                  <span className="text-2xl">→</span>
+                </button>
+              )}
+            </div>
+          </div>
         )}
       </div>
     </div>

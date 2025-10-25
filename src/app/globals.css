@@ -14,10 +14,10 @@
   --accent: #f59e0b;
   --danger: #ef4444;
   
-  --bg-base: #0f172a;
-  --bg-elevated: #1e293b;
-  --bg-card: #334155;
-  --bg-hover: #475569;
+  --bg-base: #000000;
+  --bg-elevated: #1c1513;
+  --bg-card: #553333;
+  --bg-hover: #694747;
   
   --text-primary: #f1f5f9;
   --text-secondary: #cbd5e1;
@@ -60,7 +60,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-light);
   padding: 1rem 2rem;

@@ -27,7 +27,7 @@ jobs:
         run: npm run lint
       - name: Build
         run: npm run build
-      - name: Diagnostic: show environment and package.json
+      - name: Diagnostic information
         run: |
           echo "PWD: $(pwd)"
           echo "--- ls -la ---"

@@ -7,6 +7,7 @@ import EmbeddingStep from './components/EmbeddingStep'
 import AttentionStep from './components/AttentionStep'
 import ProbabilityStep from './components/ProbabilityStep'
 import AutoregressiveStep from './components/AutoregressiveStep'
+import BibliographyStep from './components/BibliographyStep'
 import { ProcessProvider, useProcess } from '../context/ProcessContext'
 
 const DEMO_TEXTS = [
@@ -34,7 +35,8 @@ function ExploraModeloApp(){
     { id: 2, label: 'Embeddings', icon: '📊' },
     { id: 3, label: 'Atención', icon: '🎯' },
     { id: 4, label: 'Probabilidades', icon: '📈' },
-    { id: 5, label: 'Generación', icon: '✨' }
+    { id: 5, label: 'Generación', icon: '✨' },
+    { id: 6, label: 'Bibliografía', icon: '📚' }
   ]
 
   const goToStep = (stepId: number) => {
@@ -42,7 +44,7 @@ function ExploraModeloApp(){
   }
 
   const goNext = () => {
-    if (currentStep < 5) {
+    if (currentStep < 6) {
       dispatch({ type: 'SET_STEP', payload: currentStep + 1 })
     }
   }
@@ -115,6 +117,7 @@ function ExploraModeloApp(){
               {currentStep === 3 && 'El modelo aprende qué tokens son relevantes entre sí mediante self-attention'}
               {currentStep === 4 && 'El modelo calcula la probabilidad para cada posible siguiente token'}
               {currentStep === 5 && 'Generamos texto autoregresivamente: predecir → agregar → repetir'}
+              {currentStep === 6 && 'Explora papers fundamentales y recursos para profundizar en cada concepto'}
             </p>
           </div>
 
@@ -152,6 +155,13 @@ function ExploraModeloApp(){
             
             {currentStep === 5 && (
               <AutoregressiveStep 
+                onRestart={restart}
+                onNext={goNext}
+              />
+            )}
+            
+            {currentStep === 6 && (
+              <BibliographyStep 
                 onRestart={restart}
               />
             )}

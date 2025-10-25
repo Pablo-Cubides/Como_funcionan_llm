@@ -6,12 +6,13 @@ ExploraModelo es una aplicación web educativa que explica cómo funcionan los m
 
 - **Interfaz completamente en español**
 - **Tema oscuro optimizado para proyectores** (alto contraste, fuentes grandes)
-- **Proceso visual interactivo de 5 pasos:**
+- **Proceso visual interactivo de 6 pasos:**
   1. **Tokenización → IDs**: División del texto en tokens y asignación de IDs numéricos
   2. **Vectores + Posición**: Conversión a embeddings y codificación posicional
   3. **Self-Attention**: Cálculo de pesos de atención con matriz visual interactiva
   4. **Probabilidades**: Distribución de probabilidades para el siguiente token
   5. **Bucle autoregresivo**: Generación iterativa de nuevos tokens
+  6. **Bibliografía**: Papers fundamentales y recursos educativos para profundizar
 
 - **Demos precargados**: 10 frases de ejemplo en español
 - **Modo explicación**: Textos didácticos detallados en cada paso
