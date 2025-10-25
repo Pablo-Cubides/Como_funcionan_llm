@@ -1,6 +1,6 @@
 "use client"
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import InputStep from './components/InputStep'
 import TokenizationStep from './components/TokenizationStep'
 import EmbeddingStep from './components/EmbeddingStep'
@@ -28,6 +28,12 @@ export default function Page(){
 function ExploraModeloApp(){
   const { state, dispatch } = useProcess()
   const currentStep = state.currentStep ?? 0
+  const [isMounted, setIsMounted] = useState(false)
+
+  // Evitar error de hidratación - solo renderizar checkmarks en el cliente
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   const steps = [
     { id: 0, label: 'Entrada', icon: '✏️' },
@@ -94,7 +100,7 @@ function ExploraModeloApp(){
                   onClick={() => goToStep(step.id)}
                 >
                   <div className="step-circle">
-                    {currentStep > step.id ? '✓' : step.icon}
+                    {isMounted && currentStep > step.id ? '✓' : step.icon}
                   </div>
                   <span className="step-label">{step.label}</span>
                 </div>

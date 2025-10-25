@@ -84,34 +84,65 @@ export default function AutoregressiveStep({ onRestart, onNext }: Autoregressive
 
       <div className="space-y-10">
         {/* Texto en Construcción */}
-        <div className="bg-gradient-to-br from-slate-900/60 to-slate-800/40 rounded-2xl border border-slate-700 p-8 shadow-xl">
-          <h3 className="text-2xl font-bold mb-6 text-slate-200 flex items-center gap-3">
-            <span className="text-3xl">✨</span> 
+        <div className="bg-gradient-to-br from-slate-900/60 to-slate-800/40 rounded-2xl border-2 border-slate-700 p-10 shadow-2xl">
+          <h3 className="text-3xl font-bold mb-8 text-slate-200 flex items-center gap-3 justify-center">
+            <span className="text-4xl">✨</span> 
             <span>Texto en Construcción</span>
           </h3>
-          <div className="flex flex-wrap gap-3 items-center text-lg p-8 bg-slate-950/50 rounded-xl border border-slate-700 min-h-[140px]">
-            {processData.tokens.slice(0, processData.tokens.length - (processData.generatedTokens?.length || 0)).map((token, index) => (
-              <span key={index} className="px-4 py-2.5 bg-slate-700/70 text-slate-200 rounded-lg font-mono shadow-sm transition-transform hover:scale-105">
-                {token === ' ' ? '␣' : token}
-              </span>
-            ))}
-            {processData.generatedTokens?.map((token, index) => (
-              <span 
-                key={`gen-${index}`} 
-                className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg font-bold shadow-lg transform hover:scale-110 transition-transform"
-                style={{
-                  animation: `tokenPop 0.4s ease ${index * 0.1}s`
-                }}
-              >
-                {token}
-              </span>
-            ))}
-            {canGenerate && (
-              <span className="px-5 py-3 bg-blue-500/30 text-blue-300 rounded-lg font-bold animate-pulse border-2 border-blue-500/50 shadow-lg">
-                <span className="inline-block animate-bounce text-2xl">?</span>
-              </span>
-            )}
+          
+          {/* Vista principal - Texto legible */}
+          <div className="mb-8 p-8 bg-slate-950/70 rounded-xl border-2 border-slate-600">
+            <p className="text-2xl sm:text-3xl leading-relaxed text-center font-light">
+              {processData.tokens
+                .slice(0, processData.tokens.length - (processData.generatedTokens?.length || 0))
+                .map((token, index) => (
+                  <span key={`orig-${index}`} className="text-slate-300">
+                    {token}{index < processData.tokens.length - (processData.generatedTokens?.length || 0) - 1 ? ' ' : ''}
+                  </span>
+                ))}
+              {processData.generatedTokens && processData.generatedTokens.length > 0 && (
+                <>
+                  {' '}
+                  {processData.generatedTokens.map((token, index) => (
+                    <span key={`newgen-${index}`} className="text-emerald-400 font-bold">
+                      {token}{index < processData.generatedTokens.length - 1 ? ' ' : ''}
+                    </span>
+                  ))}
+                </>
+              )}
+              {canGenerate && <span className="inline-block ml-2 text-blue-400 text-3xl animate-pulse">▌</span>}
+            </p>
           </div>
+
+          {/* Vista secundaria - Tokens individuales */}
+          <details className="mt-4">
+            <summary className="cursor-pointer text-slate-400 hover:text-slate-300 text-center font-semibold">
+              👁️ Ver tokens individuales
+            </summary>
+            <div className="flex flex-wrap gap-3 items-center justify-center text-lg p-6 mt-4 bg-slate-950/50 rounded-xl border border-slate-700">
+              {processData.tokens.slice(0, processData.tokens.length - (processData.generatedTokens?.length || 0)).map((token, index) => (
+                <span key={index} className="px-3 py-2 bg-slate-700/70 text-slate-200 rounded-lg font-mono text-sm shadow-sm transition-transform hover:scale-105">
+                  {token}
+                </span>
+              ))}
+              {processData.generatedTokens?.map((token, index) => (
+                <span 
+                  key={`gen-${index}`} 
+                  className="px-3 py-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-lg font-bold text-sm shadow-lg transform hover:scale-110 transition-transform"
+                  style={{
+                    animation: `tokenPop 0.4s ease ${index * 0.1}s`
+                  }}
+                >
+                  {token}
+                </span>
+              ))}
+              {canGenerate && (
+                <span className="px-4 py-2 bg-blue-500/30 text-blue-300 rounded-lg font-bold animate-pulse border-2 border-blue-500/50 shadow-lg text-sm">
+                  ?
+                </span>
+              )}
+            </div>
+          </details>
         </div>
 
         {/* Controles de Generación */}
@@ -236,7 +267,6 @@ export default function AutoregressiveStep({ onRestart, onNext }: Autoregressive
                 className="px-10 py-4 bg-slate-700 text-slate-200 rounded-xl font-bold text-lg hover:bg-slate-600 transition-all border-2 border-slate-600 hover:border-slate-500 flex items-center gap-3 shadow-lg hover:transform hover:scale-105"
               >
                 <span className="text-2xl">🔄</span>
-                <span>Probar con Otra Frase</span>
               </button>
               {onNext && (
                 <button 

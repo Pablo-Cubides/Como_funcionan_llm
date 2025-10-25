@@ -81,24 +81,23 @@ export default function EmbeddingStep({ onNext }: EmbeddingStepProps) {
             
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
               {/* Embedding del Token */}
-              <div className="bg-slate-950/50 rounded-xl p-4 border border-slate-700">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                  <h4 className="font-bold text-slate-200 text-base">Embedding Semántico</h4>
+              <div className="bg-slate-950/50 rounded-xl p-3 border border-slate-700">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                  <h4 className="font-bold text-slate-200 text-sm">Embedding Semántico</h4>
                 </div>
-                <p className="text-xs text-slate-400 mb-3">Vector de 16 dimensiones que captura el <strong>significado</strong> de la palabra</p>
-                <div className="bg-slate-900 p-3 rounded-lg">
-                  <div className="flex flex-wrap gap-1.5">
+                <p className="text-[11px] text-slate-400 mb-2">Significado (16 dims)</p>
+                <div className="bg-slate-900 p-2 rounded-lg">
+                  <div className="grid grid-cols-8 gap-1">
                     {processData.embeddings[tokenIndex].map((value, dimIndex) => (
                       <div key={dimIndex} className="group relative">
                         <div 
                           style={{ backgroundColor: getValueColor(value) }} 
-                          className="w-10 h-10 rounded border border-slate-700 flex items-center justify-center cursor-help transition-transform hover:scale-125 hover:z-10 hover:shadow-lg"
-                        >
-                          <span className="text-[10px] font-bold text-white opacity-70 group-hover:opacity-100">{dimIndex}</span>
-                        </div>
-                        <div className="absolute hidden group-hover:block bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1.5 bg-slate-950 text-white text-xs rounded-lg shadow-xl border border-slate-600 whitespace-nowrap z-20">
-                          Dim {dimIndex}: <strong>{value.toFixed(3)}</strong>
+                          className="w-7 h-7 rounded border border-slate-700 cursor-help transition-all hover:scale-150 hover:z-20 hover:shadow-xl"
+                          title={`Dim ${dimIndex}: ${value.toFixed(3)}`}
+                        />
+                        <div className="absolute hidden group-hover:block bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-slate-950 text-white text-[10px] rounded-lg shadow-xl border border-slate-600 whitespace-nowrap z-30">
+                          <strong>{value.toFixed(3)}</strong>
                         </div>
                       </div>
                     ))}
@@ -107,24 +106,23 @@ export default function EmbeddingStep({ onNext }: EmbeddingStepProps) {
               </div>
 
               {/* Encoding Posicional */}
-              <div className="bg-slate-950/50 rounded-xl p-4 border border-slate-700">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                  <h4 className="font-bold text-slate-200 text-base">Codificación Posicional</h4>
+              <div className="bg-slate-950/50 rounded-xl p-3 border border-slate-700">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
+                  <h4 className="font-bold text-slate-200 text-sm">Codificación Posicional</h4>
                 </div>
-                <p className="text-xs text-slate-400 mb-3">Indica que esta palabra está en la <strong>posición #{tokenIndex + 1}</strong> de la secuencia</p>
-                <div className="bg-slate-900 p-3 rounded-lg">
-                  <div className="flex flex-wrap gap-1.5">
+                <p className="text-[11px] text-slate-400 mb-2">Posición #{tokenIndex + 1}</p>
+                <div className="bg-slate-900 p-2 rounded-lg">
+                  <div className="grid grid-cols-8 gap-1">
                     {processData.positionalEncodings[tokenIndex].map((value, dimIndex) => (
                       <div key={dimIndex} className="group relative">
                         <div 
                           style={{ backgroundColor: getValueColor(value) }} 
-                          className="w-10 h-10 rounded border border-slate-700 flex items-center justify-center cursor-help transition-transform hover:scale-125 hover:z-10 hover:shadow-lg"
-                        >
-                          <span className="text-[10px] font-bold text-white opacity-70 group-hover:opacity-100">{dimIndex}</span>
-                        </div>
-                        <div className="absolute hidden group-hover:block bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1.5 bg-slate-950 text-white text-xs rounded-lg shadow-xl border border-slate-600 whitespace-nowrap z-20">
-                          Pos {dimIndex}: <strong>{value.toFixed(3)}</strong>
+                          className="w-7 h-7 rounded border border-slate-700 cursor-help transition-all hover:scale-150 hover:z-20 hover:shadow-xl"
+                          title={`Pos ${dimIndex}: ${value.toFixed(3)}`}
+                        />
+                        <div className="absolute hidden group-hover:block bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-slate-950 text-white text-[10px] rounded-lg shadow-xl border border-slate-600 whitespace-nowrap z-30">
+                          <strong>{value.toFixed(3)}</strong>
                         </div>
                       </div>
                     ))}
@@ -133,24 +131,23 @@ export default function EmbeddingStep({ onNext }: EmbeddingStepProps) {
               </div>
 
               {/* Vector Combinado */}
-              <div className="bg-gradient-to-br from-blue-950/50 to-slate-950/50 rounded-xl p-4 border-2 border-blue-600/50 shadow-lg shadow-blue-900/20">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-3 h-3 rounded-full bg-blue-500"></div>
-                  <h4 className="font-bold text-blue-300 text-base">Vector Final = Suma</h4>
+              <div className="bg-gradient-to-br from-blue-950/50 to-slate-950/50 rounded-xl p-3 border-2 border-blue-600/50 shadow-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
+                  <h4 className="font-bold text-blue-300 text-sm">Vector Final</h4>
                 </div>
-                <p className="text-xs text-slate-300 mb-3"><strong>Significado + Posición</strong> = Representación completa que entra al Transformer</p>
-                <div className="bg-slate-900 p-3 rounded-lg ring-2 ring-blue-500/50">
-                  <div className="flex flex-wrap gap-1.5">
+                <p className="text-[11px] text-slate-300 mb-2">Significado + Posición</p>
+                <div className="bg-slate-900 p-2 rounded-lg ring-2 ring-blue-500/50">
+                  <div className="grid grid-cols-8 gap-1">
                     {processData.combinedEmbeddings[tokenIndex].map((value, dimIndex) => (
                       <div key={dimIndex} className="group relative">
                         <div 
                           style={{ backgroundColor: getValueColor(value) }} 
-                          className="w-10 h-10 rounded border border-blue-500/30 flex items-center justify-center cursor-help transition-transform hover:scale-125 hover:z-10 hover:shadow-lg"
-                        >
-                          <span className="text-[10px] font-bold text-white opacity-70 group-hover:opacity-100">{dimIndex}</span>
-                        </div>
-                        <div className="absolute hidden group-hover:block bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1.5 bg-blue-950 text-white text-xs rounded-lg shadow-xl border border-blue-600 whitespace-nowrap z-20">
-                          Final {dimIndex}: <strong>{value.toFixed(3)}</strong>
+                          className="w-7 h-7 rounded border border-blue-500/30 cursor-help transition-all hover:scale-150 hover:z-20 hover:shadow-xl"
+                          title={`Final ${dimIndex}: ${value.toFixed(3)}`}
+                        />
+                        <div className="absolute hidden group-hover:block bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-blue-950 text-white text-[10px] rounded-lg shadow-xl border border-blue-600 whitespace-nowrap z-30">
+                          <strong>{value.toFixed(3)}</strong>
                         </div>
                       </div>
                     ))}
@@ -164,87 +161,57 @@ export default function EmbeddingStep({ onNext }: EmbeddingStepProps) {
       </div>
 
         {isExplanationMode && (
-          <div className="p-8 bg-gradient-to-br from-indigo-950/30 to-slate-900/50 rounded-2xl border-2 border-indigo-700/30">
-            <h4 className="font-bold text-2xl text-indigo-300 mb-4 flex items-center gap-2">
-              <span>🎓</span> Explicación Académica
-            </h4>
+          <details className="mt-6 p-6 bg-gradient-to-br from-indigo-950/30 to-slate-900/50 rounded-2xl border-2 border-indigo-700/30">
+            <summary className="cursor-pointer font-bold text-xl text-indigo-300 flex items-center gap-2 hover:text-indigo-200 transition-colors">
+              <span>📖</span> Explicación Detallada (click para expandir)
+            </summary>
             
-            <div className="space-y-4 text-slate-300">
+            <div className="mt-6 space-y-6 text-slate-300">
+              {/* Embedding Semántico */}
               <div className="pl-4 border-l-4 border-red-500/50">
-                <h5 className="font-bold text-red-400 mb-2">🔴 Embeddings Semánticos - ¿Qué son?</h5>
-                <p className="text-sm leading-relaxed mb-3">
-                  💡 <strong>Imagina un diccionario mágico:</strong> Cada palabra se convierte en una lista de 16 números. 
-                  Palabras similares tienen números parecidos. Por ejemplo, &quot;perro&quot; y &quot;gato&quot; tendrían números más cercanos entre sí 
-                  que &quot;perro&quot; y &quot;piedra&quot;, porque perro y gato son ambos animales.
+                <h5 className="font-bold text-red-400 mb-3 text-lg">🔴 Embeddings = Significado en Números</h5>
+                <p className="text-sm leading-relaxed">
+                  💡 <strong>La idea simple:</strong> Convertimos palabras en listas de números. 
+                  Palabras similares tienen números parecidos. Por ejemplo: &quot;perro&quot; y &quot;gato&quot; 
+                  son más parecidos que &quot;perro&quot; y &quot;piedra&quot;.
                 </p>
-                <div className="bg-slate-800/50 rounded-lg p-3 mb-2">
-                  <p className="text-red-300 font-semibold font-mono text-sm mb-2">e<sub>t</sub> = W<sub>e</sub>[token_id]</p>
-                  <div className="text-xs text-slate-400 space-y-1 pl-3">
-                    <p>📦 <strong className="text-red-400">e<sub>t</sub></strong> = la caja con 16 números para nuestra palabra</p>
-                    <p>📚 <strong className="text-red-400">W<sub>e</sub></strong> = el diccionario completo con todas las palabras</p>
-                    <p>🔢 <strong className="text-red-400">token_id</strong> = el número de página donde está nuestra palabra</p>
-                  </div>
-                </div>
-                <div className="bg-amber-950/30 rounded-lg p-3 border-l-2 border-amber-500">
+                <div className="mt-3 bg-amber-950/30 rounded-lg p-3 border-l-2 border-amber-500">
                   <p className="text-xs text-amber-300">
-                    <strong>⚠️ Nota importante:</strong> Usamos <strong>16 dimensiones</strong> aquí para que sea fácil de ver. 
-                    Los modelos grandes reales como GPT-4 o Claude usan <strong>¡miles de dimensiones!</strong> (GPT-3 usa 12,288 dimensiones). 
-                    Más dimensiones = el modelo puede entender significados más complejos y sutiles.
+                    <strong>💡 Dato curioso:</strong> Usamos 16 números aquí para simplificar. 
+                    Los modelos reales como GPT-4 usan <strong>¡más de 10,000 números por palabra!</strong>
                   </p>
                 </div>
               </div>
 
+              {/* Codificación Posicional */}
               <div className="pl-4 border-l-4 border-yellow-500/50">
-                <h5 className="font-bold text-yellow-400 mb-2">🟡 Codificación Posicional - ¿Para qué sirve?</h5>
-                <p className="text-sm leading-relaxed mb-3">
-                  🎯 <strong>¿Por qué necesitamos esto?</strong> Imagina que le das al modelo las palabras &quot;gato come pescado&quot; 
-                  pero sin orden. El modelo no sabría si el gato come el pescado o si el pescado come al gato. ¡La posición importa!
-                  Por eso, le agregamos una &quot;etiqueta de posición&quot; a cada palabra usando funciones matemáticas especiales (seno y coseno).
+                <h5 className="font-bold text-yellow-400 mb-3 text-lg">🟡 Posición = Dónde va la Palabra</h5>
+                <p className="text-sm leading-relaxed">
+                  🎯 <strong>¿Por qué?</strong> &quot;El perro muerde al hombre&quot; es muy diferente a 
+                  &quot;El hombre muerde al perro&quot;. El orden importa, por eso añadimos información de posición 
+                  usando funciones matemáticas (seno y coseno).
                 </p>
-                <div className="bg-slate-800/50 rounded-lg p-3 mb-2">
-                  <div className="text-yellow-300 font-semibold font-mono text-xs mb-2 space-y-1">
-                    <p>PE(pos, 2i) = sin(pos / 10000<sup>2i/d</sup>)</p>
-                    <p>PE(pos, 2i+1) = cos(pos / 10000<sup>2i/d</sup>)</p>
-                  </div>
-                  <div className="text-xs text-slate-400 space-y-1 pl-3">
-                    <p>📍 <strong className="text-yellow-400">pos</strong> = en qué lugar va la palabra (1ra, 2da, 3ra...)</p>
-                    <p>🔢 <strong className="text-yellow-400">i</strong> = cuál cajoncito estamos llenando (del 0 al 15)</p>
-                    <p>📏 <strong className="text-yellow-400">d</strong> = cuántos cajoncitos hay en total (aquí son 16)</p>
-                    <p>➗ <strong className="text-yellow-400">sin/cos</strong> = funciones matemáticas que crean patrones especiales de números</p>
-                  </div>
-                </div>
               </div>
 
+              {/* Vector Final */}
               <div className="pl-4 border-l-4 border-blue-500/50">
-                <h5 className="font-bold text-blue-400 mb-2">🔵 Vector Final - ¡Juntando Todo!</h5>
-                <p className="text-sm leading-relaxed mb-3">
-                  ✨ <strong>El truco final:</strong> Sumamos los 16 números del significado de la palabra CON los 16 números de su posición. 
-                  Es como poner dos capas de información juntas. Así el modelo sabe <em>qué es</em> la palabra Y <em>dónde está</em> al mismo tiempo.
-                </p>
-                <div className="bg-slate-800/50 rounded-lg p-3 mb-2">
-                  <p className="text-blue-300 font-semibold font-mono text-sm mb-2">x = Embedding(token) + PositionalEncoding(posición)</p>
-                  <div className="text-xs text-slate-400 space-y-1 pl-3">
-                    <p>🎁 <strong className="text-blue-400">x</strong> = el regalo final con toda la información (16 números)</p>
-                    <p>💭 <strong className="text-blue-400">Embedding(token)</strong> = lo que significa la palabra</p>
-                    <p>📌 <strong className="text-blue-400">PositionalEncoding</strong> = dónde está ubicada</p>
-                  </div>
-                </div>
-                <p className="text-sm text-slate-400">
-                  🧩 Piénsalo como un rompecabezas: cada pieza (palabra) tiene un color (significado) y un número (posición). 
-                  ¡Así el modelo puede armar la imagen completa correctamente!
+                <h5 className="font-bold text-blue-400 mb-3 text-lg">🔵 Vector Final = Todo Junto</h5>
+                <p className="text-sm leading-relaxed">
+                  ✨ <strong>El truco:</strong> Sumamos los números del significado CON los números de la posición. 
+                  Así el modelo sabe <em>qué es</em> la palabra Y <em>dónde está</em>.
                 </p>
               </div>
 
-              <div className="mt-4 p-4 bg-slate-800/50 rounded-lg">
+              <div className="mt-4 p-3 bg-slate-800/50 rounded-lg">
                 <p className="text-xs text-slate-400">
-                  <strong className="text-slate-300">🎨 Cómo leer los colores:</strong> 
-                  <span className="text-red-400 font-semibold"> ■ Rojo</span> = números positivos (van hacia arriba), 
-                  <span className="text-blue-400 font-semibold"> ■ Azul</span> = números negativos (van hacia abajo). 
-                  Si el color es más fuerte, el número es más grande. ¡Pasa el ratón sobre cada cuadrito para ver el número exacto!
+                  <strong>🎨 Cómo leer los colores:</strong> 
+                  <span className="text-red-400"> ■ Rojo</span> = positivo, 
+                  <span className="text-blue-400"> ■ Azul</span> = negativo. 
+                  Pasa el mouse sobre los cuadros para ver los valores exactos.
                 </p>
               </div>
             </div>
-          </div>
+          </details>
         )}
 
         <div className="text-center mt-6">

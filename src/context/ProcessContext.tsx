@@ -31,19 +31,6 @@ export const initialState: AppState = {
   processData: null,
 };
 
-// Helper to load persisted state (safely)
-function loadPersistedState(): Partial<AppState> | null {
-  try {
-    if (typeof window === 'undefined') return null;
-    const raw = window.localStorage.getItem('exploramodelo_state');
-    if (!raw) return null;
-    return JSON.parse(raw);
-  } catch (e) {
-    console.warn('Could not load persisted state', e);
-    return null;
-  }
-}
-
 // 2. Crear el reducer
 export function appReducer(state: AppState, action: Action): AppState {
   switch (action.type) {
@@ -144,8 +131,15 @@ const ProcessContext = createContext<{ state: AppState; dispatch: React.Dispatch
 
 // 4. Crear el Provider
 export function ProcessProvider({ children }: { children: ReactNode }) {
-  const persisted = loadPersistedState();
-  const [state, dispatch] = useReducer(appReducer, persisted ? { ...initialState, ...persisted } : initialState);
+  // Siempre iniciar desde el paso 0 para evitar problemas de hidratación
+  const [state, dispatch] = useReducer(appReducer, initialState);
+
+  // Limpiar localStorage al montar para evitar estados inconsistentes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem('exploramodelo_state');
+    }
+  }, []);
 
   // Persist a safe subset of state to localStorage with debounce
   useEffect(() => {

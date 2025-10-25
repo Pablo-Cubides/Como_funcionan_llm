@@ -11,12 +11,17 @@ export function hashToken(token: string): number {
   return Math.abs(hash) % 10000; // Expanded vocabulary size
 }
 
-// Simple tokenizer - splits on whitespace and punctuation
+// Simple tokenizer - splits on whitespace and punctuation, preserving structure
 export function tokenize(text: string): string[] {
-  return text
-    .toLowerCase()
-    .split(/(\s+|[.,!?;:()"-])/) 
-    .filter(token => token.trim().length > 0);
+  // Normalize spaces first
+  const normalized = text.replace(/\s+/g, ' ').trim();
+  
+  // Split by word boundaries while keeping punctuation separate
+  const tokens = normalized
+    .split(/(\s+|[.,!?;:()"'-])/)
+    .filter(token => token.length > 0 && token !== ' '); // Remove empty and standalone spaces
+  
+  return tokens;
 }
 
 // Generate deterministic embedding vector for a token
