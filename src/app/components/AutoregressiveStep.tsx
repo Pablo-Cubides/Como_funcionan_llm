@@ -221,14 +221,14 @@ export default function AutoregressiveStep({ onRestart, onNext }: Autoregressive
           </div>
         )}
 
-        {/* Explicación del Bucle Autoregresivo */}
+        {/* Explicación del Bucle Autoregresivo (colapsable) */}
         {isExplanationMode && generationSteps.length > 0 && (
-          <div className="p-10 bg-gradient-to-br from-green-950/30 to-slate-900/50 rounded-2xl border-2 border-green-700/30 shadow-xl">
-            <h4 className="font-bold text-3xl text-green-300 mb-6 flex items-center gap-3">
-              <span className="text-4xl">🔄</span> 
-              <span>Bucle Autoregresivo</span>
-            </h4>
-            <div className="space-y-5 text-slate-300">
+          <details className="p-10 bg-gradient-to-br from-green-950/30 to-slate-900/50 rounded-2xl border-2 border-green-700/30 shadow-xl">
+            <summary className="cursor-pointer font-bold text-3xl text-green-300 mb-6 flex items-center gap-3 hover:text-green-200">
+              <span className="text-4xl">🔄</span>
+              <span>Bucle Autoregresivo — Explicación Detallada</span>
+            </summary>
+            <div className="mt-6 space-y-5 text-slate-300">
               <p className="text-lg leading-relaxed">
                 La generación autoregresiva es un <strong className="text-green-400">bucle de retroalimentación</strong>:
               </p>
@@ -250,7 +250,7 @@ export default function AutoregressiveStep({ onRestart, onNext }: Autoregressive
                 </p>
               </div>
             </div>
-          </div>
+          </details>
         )}
 
         {/* Mensaje de Completado */}

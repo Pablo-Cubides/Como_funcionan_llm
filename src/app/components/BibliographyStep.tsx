@@ -144,52 +144,29 @@ export default function BibliographyStep({ onRestart }: BibliographyStepProps) {
       </div>
 
       <div className="space-y-8">
-        {/* Papers Fundamentales */}
+        {/* Referencias Clave */}
         <section className="bg-gradient-to-br from-slate-900/60 to-slate-800/40 rounded-2xl border border-slate-700 p-8 shadow-xl">
           <h3 className="text-2xl font-bold mb-6 text-slate-200 flex items-center gap-2">
-            <span>📄</span> Papers Fundamentales
+            <span>�</span> Referencias
           </h3>
-          
           <div className="space-y-4">
             {references.map((ref, index) => (
-              <article 
-                key={index}
-                className="p-5 bg-slate-800/50 rounded-xl border border-slate-700 hover:border-blue-500/50 transition-all group"
-              >
+              <article key={index} className="p-5 bg-slate-800/50 rounded-xl border border-slate-700 hover:border-blue-500/50 transition-all group">
                 <div className="flex flex-col gap-3">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-grow">
-                      <h4 className="text-lg font-bold text-slate-100 group-hover:text-blue-400 transition-colors mb-1">
-                        {ref.title}
-                      </h4>
-                      <p className="text-sm text-slate-400 mb-2">
-                        {ref.authors} ({ref.year}) - <span className="text-blue-400">{ref.venue}</span>
-                      </p>
+                      <h4 className="text-lg font-bold text-slate-100 group-hover:text-blue-400 transition-colors mb-1">{ref.title}</h4>
+                      <p className="text-sm text-slate-400 mb-2">{ref.authors} ({ref.year}) - <span className="text-blue-400">{ref.venue}</span></p>
                     </div>
-                    <a
-                      href={ref.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-shrink-0 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold text-sm transition-all flex items-center gap-2"
-                      aria-label={`Leer ${ref.title}`}
-                    >
+                    <a href={ref.url} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold text-sm transition-all flex items-center gap-2" aria-label={`Leer ${ref.title}`}>
                       <span>📖</span>
                       <span>Leer</span>
                     </a>
                   </div>
-                  
-                  <p className="text-slate-300 text-sm leading-relaxed">
-                    {ref.description}
-                  </p>
-                  
+                  <p className="text-slate-300 text-sm leading-relaxed">{ref.description}</p>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {ref.keywords.map((keyword, idx) => (
-                      <span 
-                        key={idx}
-                        className="px-3 py-1 bg-slate-700/50 text-slate-300 rounded-full text-xs font-medium border border-slate-600"
-                      >
-                        #{keyword}
-                      </span>
+                      <span key={idx} className="px-3 py-1 bg-slate-700/50 text-slate-300 rounded-full text-xs font-medium border border-slate-600">#{keyword}</span>
                     ))}
                   </div>
                 </div>
@@ -198,98 +175,61 @@ export default function BibliographyStep({ onRestart }: BibliographyStepProps) {
           </div>
         </section>
 
-        {/* Recursos Educativos */}
+        {/* Recursos */}
         <section className="bg-gradient-to-br from-slate-900/60 to-slate-800/40 rounded-2xl border border-slate-700 p-8 shadow-xl">
           <h3 className="text-2xl font-bold mb-6 text-slate-200 flex items-center gap-2">
-            <span>🎓</span> Recursos Educativos Adicionales
+            <span>🔗</span> Recursos
           </h3>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {additionalResources.map((resource, index) => (
-              <a
-                key={index}
-                href={resource.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-4 bg-slate-800/50 rounded-xl border border-slate-700 hover:border-green-500/50 transition-all group"
-              >
-                <h4 className="font-bold text-slate-100 group-hover:text-green-400 transition-colors mb-2 flex items-center gap-2">
-                  <span>🔗</span>
-                  {resource.title}
-                </h4>
-                <p className="text-sm text-slate-400">
-                  {resource.description}
-                </p>
+              <a key={index} href={resource.url} target="_blank" rel="noopener noreferrer" className="p-4 bg-slate-800/50 rounded-xl border border-slate-700 hover:border-green-500/50 transition-all group">
+                <h4 className="font-bold text-slate-100 group-hover:text-green-400 transition-colors mb-2 flex items-center gap-2"><span>🔗</span>{resource.title}</h4>
+                <p className="text-sm text-slate-400">{resource.description}</p>
               </a>
             ))}
           </div>
         </section>
 
-        {/* Explicación de términos */}
+        {/* FAQ */}
         {isExplanationMode && (
           <section className="p-8 bg-gradient-to-br from-purple-950/30 to-slate-900/50 rounded-2xl border-2 border-purple-700/30">
-            <h4 className="font-bold text-2xl text-purple-300 mb-4 flex items-center gap-2">
-              <span>💡</span> Glosario de Términos Técnicos
-            </h4>
+            <h4 className="font-bold text-2xl text-purple-300 mb-4 flex items-center gap-2"><span>❓</span> FAQ</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-slate-300 text-sm">
               <div className="p-4 bg-slate-800/30 rounded-lg">
-                <p className="font-bold text-purple-400 mb-2">Transformer</p>
-                <p>Arquitectura de red neuronal basada en mecanismos de atención, introducida en 2017. Base de GPT, BERT y la mayoría de LLMs modernos.</p>
+                <p className="font-bold text-purple-400 mb-2">¿Dónde puedo ver Tokenización?</p>
+                <p>Ve al paso de Tokenización para observar cómo el texto se divide en tokens y cómo se asignan IDs.</p>
+                <button onClick={() => dispatch({ type: 'SET_STEP', payload: 1 })} className="mt-3 text-blue-300 underline">Ir a Tokenización</button>
               </div>
               <div className="p-4 bg-slate-800/30 rounded-lg">
-                <p className="font-bold text-purple-400 mb-2">Self-Attention</p>
-                <p>Mecanismo que permite a cada token "mirar" a todos los demás tokens para determinar su importancia contextual en la secuencia.</p>
+                <p className="font-bold text-purple-400 mb-2">¿Qué son los embeddings?</p>
+                <p>Los embeddings son vectores numéricos que codifican significado; mira el paso de Embeddings para ejemplos visuales.</p>
+                <button onClick={() => dispatch({ type: 'SET_STEP', payload: 2 })} className="mt-3 text-blue-300 underline">Ir a Embeddings</button>
               </div>
               <div className="p-4 bg-slate-800/30 rounded-lg">
-                <p className="font-bold text-purple-400 mb-2">Pre-training</p>
-                <p>Fase de entrenamiento en grandes cantidades de texto sin supervisión, donde el modelo aprende patrones generales del lenguaje.</p>
+                <p className="font-bold text-purple-400 mb-2">¿Qué es Self-Attention?</p>
+                <p>Self-Attention permite que cada token evalúe a los demás para obtener contexto; ver el paso de Atención para la matriz de pesos.</p>
+                <button onClick={() => dispatch({ type: 'SET_STEP', payload: 3 })} className="mt-3 text-blue-300 underline">Ir a Atención</button>
               </div>
               <div className="p-4 bg-slate-800/30 rounded-lg">
-                <p className="font-bold text-purple-400 mb-2">Few-Shot Learning</p>
-                <p>Capacidad del modelo para realizar nuevas tareas con solo unos pocos ejemplos, sin re-entrenamiento.</p>
-              </div>
-              <div className="p-4 bg-slate-800/30 rounded-lg">
-                <p className="font-bold text-purple-400 mb-2">Embeddings</p>
-                <p>Representaciones vectoriales densas que capturan el significado semántico de palabras o tokens en un espacio continuo.</p>
-              </div>
-              <div className="p-4 bg-slate-800/30 rounded-lg">
-                <p className="font-bold text-purple-400 mb-2">Autoregresivo</p>
-                <p>Proceso de generación secuencial donde cada nuevo token se predice basándose en todos los tokens anteriores.</p>
+                <p className="font-bold text-purple-400 mb-2">¿Cómo se generan las palabras?</p>
+                <p>El modelo calcula probabilidades y selecciona tokens según una estrategia; revisa Probabilidades y Generación.</p>
+                <div className="mt-3 flex gap-3">
+                  <button onClick={() => dispatch({ type: 'SET_STEP', payload: 4 })} className="text-blue-300 underline">Probabilidades</button>
+                  <button onClick={() => dispatch({ type: 'SET_STEP', payload: 5 })} className="text-blue-300 underline">Generación</button>
+                </div>
               </div>
             </div>
           </section>
         )}
 
-        {/* Botones de acción */}
+        {/* Cierre */}
         <div className="text-center p-8 bg-gradient-to-br from-emerald-900/50 to-green-900/30 border-2 border-emerald-600 rounded-2xl shadow-2xl">
           <div className="text-6xl mb-4">🎓</div>
-          <h3 className="text-3xl font-bold text-emerald-300 mb-3">
-            ¡Has Completado el Recorrido!
-          </h3>
-          <p className="text-slate-300 text-lg max-w-2xl mx-auto mb-6">
-            Ahora comprendes los componentes fundamentales de los modelos de lenguaje: 
-            tokenización, embeddings, atención, probabilidades y generación autoregresiva. 
-            Usa estas referencias para profundizar en cada concepto.
-          </p>
-          
+          <h3 className="text-3xl font-bold text-emerald-300 mb-3">Cierre</h3>
+          <p className="text-slate-300 text-lg max-w-2xl mx-auto mb-6">Has completado el recorrido. Usa las referencias y recursos para profundizar y vuelve a experimentar con otros textos de ejemplo.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <button 
-              onClick={handleRestart}
-              className="navigation-button px-10 py-4"
-            >
-              <span>🔄</span>
-              <span>Empezar de Nuevo</span>
-            </button>
-            
-            <a
-              href="https://github.com/Pablo-Cubides/Como_funcionan_llm"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-10 py-4 bg-slate-700 text-slate-200 rounded-xl font-semibold hover:bg-slate-600 transition-all border border-slate-600 hover:border-slate-500 inline-flex items-center justify-center gap-2"
-            >
-              <span>⭐</span>
-              <span>Ver en GitHub</span>
-            </a>
+            <button onClick={handleRestart} className="navigation-button px-10 py-4"><span>🔄</span><span>Empezar de Nuevo</span></button>
+            <a href="https://github.com/Pablo-Cubides/Como_funcionan_llm" target="_blank" rel="noopener noreferrer" className="px-10 py-4 bg-slate-700 text-slate-200 rounded-xl font-semibold hover:bg-slate-600 transition-all border border-slate-600 hover:border-slate-500 inline-flex items-center justify-center gap-2"><span>⭐</span><span>Ver en GitHub</span></a>
           </div>
         </div>
       </div>

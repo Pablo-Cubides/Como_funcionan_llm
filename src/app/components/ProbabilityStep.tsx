@@ -29,13 +29,14 @@ export default function ProbabilityStep({ onNext }: ProbabilityStepProps) {
     <div className="p-8 sm:p-12 panel">
       <div className="text-center mb-12">
         <h2 className="step-title">Paso 4: Probabilidades</h2>
-        {isExplanationMode && (
-          <p className="step-description">
-            🎲 <strong>Momento de adivinar:</strong> El modelo lee todas las palabras que ya tiene y piensa 
-            &quot;¿Cuál palabra debería venir después?&quot;. Es como jugar a completar frases: si dices &quot;Me gusta comer...&quot;, 
-            probablemente piensas en comida. El modelo hace lo mismo, pero con números que muestran qué tan seguro está de cada opción.
-          </p>
-        )}
+            <p className="step-description">
+              🎲 <strong>Momento de adivinar:</strong> El modelo lee todo el contexto anterior, calcula una puntuación para cada posible siguiente token y convierte esas puntuaciones en porcentajes que suman 100%. Luego ordena las opciones y muestra las más probables en el Top 10.
+            </p>
+            {isExplanationMode && (
+              <p className="step-description mt-3 text-sm text-slate-300">
+                (Explicación extendida disponible abajo en &quot;Explicación Detallada&quot;)
+              </p>
+            )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -85,33 +86,60 @@ export default function ProbabilityStep({ onNext }: ProbabilityStepProps) {
                 </span>
                 </div>
             </div>
+      {/* New explanatory section requested by user: visible between Top10 and the detailed accordion */}
+      <div className="bg-gradient-to-br from-slate-900/40 to-slate-800/30 rounded-2xl border border-slate-700 p-6 shadow-inner">
+        <h3 className="text-xl font-bold mb-3 text-slate-200">¿Qué está haciendo el modelo aquí?</h3>
+        <p className="text-sm text-slate-300 leading-relaxed">Piensa en esto como completar la frase. Si lees: &ldquo;Para estudiar mejor, recomiendo hacer resúmenes&rdquo;, y luego ves &ldquo;Para estudiar mejor, recomiendo hacer resúmenes ___&rdquo;, tu cerebro ya está pensando en &ldquo;claros&rdquo;, &ldquo;diarios&rdquo;, &ldquo;detallados&rdquo;… Estás prediciendo la siguiente palabra.</p>
+        <p className="text-sm text-slate-300 leading-relaxed mt-3">El modelo hace lo mismo:</p>
+        <ul className="list-disc list-inside text-slate-300 mt-2">
+          <li>Mira todo el contexto anterior.</li>
+          <li>Calcula una puntuación para cada posible siguiente token.</li>
+          <li>Convierte esas puntuaciones en porcentajes que suman 100%.</li>
+          <li>Ordena de mayor a menor.</li>
+        </ul>
+        <p className="text-sm text-slate-300 mt-3 font-semibold">Eso es literalmente lo que estás viendo en el Top 10.</p>
+
+        <h4 className="font-semibold text-slate-200 mt-4">🤔 ¿Cómo decide el modelo?</h4>
+        <p className="text-sm text-slate-300 mt-2">Texto resumido: El modelo ya procesó el contexto con embeddings, posición y self-attention. Con todo eso genera una puntuación interna para cada posible siguiente token del vocabulario. Luego convierte esas puntuaciones en probabilidades usando una función llamada <strong>softmax</strong>, que asegura que todas las opciones sumen 100%.</p>
+      </div>
             {isExplanationMode && (
-                <div className="p-6 bg-gradient-to-br from-amber-950/30 to-slate-900/50 rounded-2xl border-2 border-amber-700/30">
-                    <h4 className="font-bold text-xl text-amber-300 mb-3 flex items-center gap-2">
-                      <span>📊</span> ¿Cómo Decide el Modelo?
-                    </h4>
-                    <div className="space-y-3 text-slate-300 text-sm">
-                      <p>
-                        🎯 <strong>El proceso es simple:</strong> El modelo toma toda la información que procesó (las palabras con su significado y posición) 
-                        y la compara con todas las palabras que conoce. Es como tener un examen de opción múltiple: el modelo le da una &quot;nota&quot; 
-                        a cada posible palabra, y luego convierte esas notas en porcentajes usando una fórmula llamada <strong className="text-amber-400">softmax</strong>.
-                      </p>
+                <details className="p-6 bg-gradient-to-br from-amber-950/30 to-slate-900/50 rounded-2xl border-2 border-amber-700/30">
+                    <summary className="cursor-pointer font-bold text-xl text-amber-300 mb-3 flex items-center gap-2 hover:text-amber-200">
+                      <span>🔎</span> Explicación Detallada (haz clic para expandir)
+                    </summary>
+                    <div className="mt-4 space-y-4 text-slate-300 text-sm">
+                      <h5 className="font-semibold">1. Del puntaje crudo a probabilidad</h5>
+                      <p>Primero, el modelo asigna a cada token un puntaje interno z<sub>i</sub>. Estos no son probabilidades. Luego aplica softmax para convertirlos en porcentajes:</p>
                       <div className="bg-slate-900/50 rounded-lg p-4">
                         <p className="font-mono text-sm text-center mb-3">P(token<sub>i</sub>) = exp(z<sub>i</sub>) / Σ<sub>j</sub> exp(z<sub>j</sub>)</p>
-                        <div className="text-xs text-slate-400 space-y-1 pl-3 border-l-2 border-amber-500/50">
-                          <p>🎯 <strong className="text-amber-400">P(token<sub>i</sub>)</strong> = ¿Qué tan probable es esta palabra? (de 0% a 100%)</p>
-                          <p>📝 <strong className="text-amber-400">z<sub>i</sub></strong> = la &quot;nota&quot; inicial de esta palabra</p>
-                          <p>📈 <strong className="text-amber-400">exp()</strong> = una función matemática que hace las diferencias más claras</p>
-                          <p>➕ <strong className="text-amber-400">Σ<sub>j</sub></strong> = suma las notas de TODAS las palabras posibles</p>
-                        </div>
+                        <p className="text-xs text-slate-400">z<sub>i</sub> = nota del modelo; exp() amplifica diferencias; la división normaliza entre 0–100%.</p>
                       </div>
-                      <p>
-                        ✨ <strong>El truco:</strong> Dividir cada nota por la suma total hace que todos los porcentajes sumen exactamente 100%. 
-                        La palabra con el porcentaje más alto es la que el modelo cree que debería ir después. ¡En modelos grandes como GPT-4, 
-                        esto se hace con vocabularios de ¡más de 50,000 palabras!
-                      </p>
+
+                      <h5 className="font-semibold">2. ¿Por qué a veces no elige la #1?</h5>
+                      <p>El modelo no siempre elige la palabra más probable. Para mayor naturalidad se usan muestreos:</p>
+                      <ul className="list-disc list-inside text-slate-300">
+                        <li><strong>Top-k:</strong> considerar solo las k opciones más probables.</li>
+                        <li><strong>Top-p / Nucleus:</strong> tomar las opciones cuya probabilidad acumulada suma p (ej. 0.9).</li>
+                        <li><strong>Temperature:</strong> controlar cuán arriesgado es el muestreo (alta = más creativo).</li>
+                      </ul>
+
+                      <h5 className="font-semibold">3. ¿Por qué dice “tokens”, no “palabras completas”?</h5>
+                      <p>El modelo predice tokens: estos pueden ser palabras completas, subpalabras o signos de puntuación. Por eso el Top 10 muestra tokens, no siempre palabras enteras.</p>
+
+                      <h5 className="font-semibold">4. ¿Y esto a dónde va?</h5>
+                      <p>La probabilidad más alta (o la muestra seleccionada) se añade al texto; luego el proceso se repite: esto es la generación autoregresiva.</p>
+
+                      <h5 className="font-semibold">5. Mito vs Realidad</h5>
+                      <p><strong>⚠ Mito:</strong> &ldquo;El modelo sabe exactamente lo que quiero&rdquo;. <strong>✅ Realidad:</strong> &ldquo;El modelo elige token por token la mejor salida según patrones de entrenamiento&rdquo;.</p>
+
+                      <h5 className="font-semibold">📚 Bibliografía / Lecturas recomendadas</h5>
+                      <ul className="list-disc list-inside text-slate-400">
+                        <li><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noreferrer" className="text-blue-300 underline">Vaswani et al., Attention Is All You Need (2017)</a></li>
+                        <li><a href="https://arxiv.org/abs/1810.04805" target="_blank" rel="noreferrer" className="text-blue-300 underline">Devlin et al., BERT (2018)</a></li>
+                        <li><a href="https://arxiv.org/abs/2005.14165" target="_blank" rel="noreferrer" className="text-blue-300 underline">Brown et al., GPT-3 (2020)</a></li>
+                      </ul>
                     </div>
-                </div>
+                </details>
             )}
         </div>
       </div>

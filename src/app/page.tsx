@@ -36,13 +36,13 @@ function ExploraModeloApp(){
   }, [])
 
   const steps = [
-    { id: 0, label: 'Entrada', icon: '✏️' },
-    { id: 1, label: 'Tokenización', icon: '🔤' },
-    { id: 2, label: 'Embeddings', icon: '📊' },
-    { id: 3, label: 'Atención', icon: '🎯' },
-    { id: 4, label: 'Probabilidades', icon: '📈' },
-    { id: 5, label: 'Generación', icon: '✨' },
-    { id: 6, label: 'Bibliografía', icon: '📚' }
+    { id: 0, label: 'Entrada', icon: '✏️', color: '#8b5cf6' },
+    { id: 1, label: 'Tokenización', icon: '🔤', color: '#06b6d4' },
+    { id: 2, label: 'Embeddings', icon: '📊', color: '#f59e0b' },
+    { id: 3, label: 'Atención', icon: '🎯', color: '#ec4899' },
+    { id: 4, label: 'Probabilidades', icon: '📈', color: '#10b981' },
+    { id: 5, label: 'Generación', icon: '✨', color: '#6366f1' },
+    { id: 6, label: 'Bibliografía', icon: '📚', color: '#8b5cf6' }
   ]
 
   const goToStep = (stepId: number) => {
@@ -88,34 +88,51 @@ function ExploraModeloApp(){
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="app-main">
-        {/* Progress Stepper */}
-        <div className="progress-container">
-          <div className="stepper">
-            {steps.map((step, index) => (
+      {/* Stepper Horizontal - Todas las pantallas */}
+      <div className="progress-container-mobile">
+        <div className="stepper-horizontal">
+          {steps.map((step, index) => {
+            const isActive = currentStep === step.id
+            const isCompleted = currentStep > step.id
+            
+            return (
               <React.Fragment key={step.id}>
-                <div 
-                  className={`step-item ${currentStep === step.id ? 'active' : ''} ${currentStep > step.id ? 'completed' : ''}`}
+                <div
+                  className={`step-item-horizontal ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}
                   onClick={() => goToStep(step.id)}
                 >
-                  <div className="step-circle">
-                    {isMounted && currentStep > step.id ? '✓' : step.icon}
+                  <div className="step-circle-horizontal">
+                    {isMounted && isCompleted ? '✓' : step.icon}
                   </div>
-                  <span className="step-label">{step.label}</span>
+                  <span className="step-label-horizontal">{step.label}</span>
                 </div>
                 {index < steps.length - 1 && (
-                  <div className={`step-connector ${currentStep > step.id ? 'completed' : ''}`}></div>
+                  <div style={{
+                    width: '24px',
+                    height: '2px',
+                    background: isCompleted ? '#10b981' : '#2a2a2a',
+                    flexShrink: 0
+                  }} />
                 )}
               </React.Fragment>
-            ))}
-          </div>
+            )
+          })}
         </div>
+      </div>
 
+      {/* Main Content */}
+      <main className="app-main">
         {/* Step Content Card */}
-        <div className="card">
+        <div className="card card-glass">
           <div className="card-header">
-            <h2 className="card-title">{steps[currentStep].label}</h2>
+            <h2 className="card-title" style={{
+              background: `linear-gradient(135deg, ${steps[currentStep].color}, #10b981)`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}>
+              {steps[currentStep].icon} {steps[currentStep].label}
+            </h2>
             <p className="card-subtitle">
               {currentStep === 0 && 'Escribe o selecciona un texto de ejemplo para comenzar el proceso'}
               {currentStep === 1 && 'Observa cómo el texto se divide en tokens individuales'}

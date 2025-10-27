@@ -44,7 +44,7 @@ export default function AttentionStep({ onNext }: AttentionStepProps) {
   return (
     <div className="p-8 sm:p-12 panel">
       <div className="text-center mb-12">
-        <h2 className="step-title">Paso 3: Multi-Head Self-Attention</h2>
+        <h2 className="step-title">🧠 ¿Cómo funciona Self-Attention?</h2>
         {isExplanationMode && (
           <p className="step-description">
             🧠 <strong>Imagina que cada palabra puede &quot;mirar&quot; a todas las demás palabras para entenderlas mejor.</strong> 
@@ -116,48 +116,65 @@ export default function AttentionStep({ onNext }: AttentionStepProps) {
           </div>
         </div>
     {isExplanationMode && (
-      <div className="mt-6 p-6 bg-gradient-to-br from-purple-950/30 to-slate-900/50 rounded-2xl border-2 border-purple-700/30">
-        <h4 className="font-bold text-xl text-purple-300 mb-3 flex items-center gap-2">
-          <span>🧠</span> ¿Cómo funciona Self-Attention?
-        </h4>
-        <div className="space-y-3 text-slate-300 text-sm leading-relaxed">
-          <p>
-            👀 <strong className="text-purple-400">La idea principal:</strong> Imagina que estás leyendo &quot;El gato comió pescado&quot;. 
-            Cuando lees &quot;comió&quot;, tu cerebro automáticamente piensa &quot;¿Quién comió? ¿Qué comió?&quot; y conecta &quot;gato&quot; con &quot;comió&quot; 
-            y &quot;comió&quot; con &quot;pescado&quot;. ¡Eso es exactamente lo que hace la atención! Los números en la tabla muestran qué tan conectadas están las palabras 
-            (100% = muy conectadas, 0% = no relacionadas).
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
-            <div className="p-3 bg-slate-800/50 rounded-lg border border-slate-700">
-              <p className="font-semibold text-blue-400 mb-2">🔍 Query (Q): &quot;¿Qué busco?&quot;</p>
-              <p className="text-xs">Como cuando preguntas &quot;¿Quién comió?&quot; - es lo que una palabra quiere encontrar en las demás</p>
-            </div>
-            <div className="p-3 bg-slate-800/50 rounded-lg border border-slate-700">
-              <p className="font-semibold text-green-400 mb-2">🔑 Key (K): &quot;¿Qué soy yo?&quot;</p>
-              <p className="text-xs">La &quot;tarjeta de identificación&quot; de cada palabra que dice qué tipo de información tiene</p>
-            </div>
-            <div className="p-3 bg-slate-800/50 rounded-lg border border-slate-700">
-              <p className="font-semibold text-yellow-400 mb-2">📦 Value (V): &quot;¿Qué información llevo?&quot;</p>
-              <p className="text-xs">El contenido real que una palabra aporta cuando otras la necesitan</p>
-            </div>
-            <div className="p-3 bg-slate-800/50 rounded-lg border border-slate-700">
-              <p className="font-semibold text-purple-400 mb-2 font-mono text-sm">🔢 Attention = Softmax(QK<sup>T</sup>/√d<sub>k</sub>)V</p>
-              <div className="text-xs text-slate-400 space-y-1 pl-2">
-                <p>🔍 <strong className="text-purple-300">Q</strong> = lista de preguntas de cada palabra</p>
-                <p>🔑 <strong className="text-purple-300">K</strong> = lista de respuestas que cada palabra puede dar</p>
-                <p>📦 <strong className="text-purple-300">V</strong> = el contenido real de cada palabra</p>
-                <p>📏 <strong className="text-purple-300">d<sub>k</sub></strong> = número mágico para que los cálculos no se vuelvan locos</p>
-                <p>🎯 <strong className="text-purple-300">Softmax</strong> = convierte números en porcentajes que suman 100%</p>
-              </div>
-            </div>
-          </div>
-          <p className="mt-4">
-            👥 <strong className="text-purple-400">¿Por qué {processData.attentionHeads.length} &quot;cabezas&quot;?</strong> 
-            Es como tener {processData.attentionHeads.length} amigos diferentes leyendo la misma frase. Uno se fija en quién hace qué, 
-            otro en los objetos, otro en el tiempo, etc. Al final juntas lo que todos vieron y ¡tienes una comprensión mucho más completa! 
-            Los LLMs grandes usan ¡decenas de cabezas!
-          </p>
+      <div className="mt-6 p-6 bg-gradient-to-br from-purple-950/6 to-slate-900/20 rounded-2xl">
+        {/* General explanation visible first */}
+        <div className="mb-4 text-slate-300">
+          <h4 className="font-bold text-2xl text-purple-300 mb-2 flex items-center gap-2">🧠 ¿Cómo funciona Self-Attention?</h4>
+              <p className="text-sm leading-relaxed">
+                Self-attention es la forma en que el modelo decide qué partes de la frase son importantes para cada palabra. Cada palabra &ldquo;mira&rdquo; a todas las demás palabras y les asigna un peso de importancia (atención). Las más relevantes reciben puntajes altos; las menos relevantes, puntajes bajos. Esta es la base de los Transformers y de casi todos los LLMs modernos.
+              </p>
+          <h5 className="font-semibold text-lg text-slate-200 mt-4">📊 Cómo leer la matriz de atención</h5>
+          <ul className="list-disc list-inside text-slate-300 text-sm mt-2 space-y-2">
+            <li>Cada fila representa una palabra que está &ldquo;prestando atención&rdquo;.</li>
+            <li>Cada columna representa una palabra que podría ser importante para ella.</li>
+            <li>El número (porcentaje) indica cuánta atención le dedica una palabra a otra.</li>
+            <li>100% → súper importante en ese momento. 0% → prácticamente ignorada. El color más oscuro significa &ldquo;más atención&rdquo;.</li>
+          </ul>
+          <p className="text-sm leading-relaxed mt-3">Ejemplo de lectura: si en la fila de una palabra ves porcentajes altos sobre otra palabra, significa &ldquo;esta palabra necesita a esa otra para entender su propio significado en contexto&rdquo;.</p>
+          <h5 className="font-semibold text-lg text-slate-200 mt-4">� ¿Por qué hace eso?</h5>
+          <p className="text-sm leading-relaxed">Porque entender una frase no es solo leer palabras aisladas. El modelo necesita saber quién hace la acción, qué acción ocurre, a qué se refiere esa acción y con qué matiz. Self-attention permite que el modelo aprenda todas esas relaciones en paralelo, capturando contexto largo y dependencias complejas.</p>
         </div>
+
+        {/* Detailed accordion */}
+        <details className="bg-slate-900/50 rounded-2xl border border-slate-700 p-4">
+            <summary className="cursor-pointer font-bold text-lg text-purple-300">🔍 Explicación Detallada (haz clic para expandir)</summary>
+          <div className="mt-4 text-slate-300 space-y-4 text-sm">
+            <h5 className="font-semibold">💡 Resumen rápido</h5>
+            <p>Self-attention responde: ¿A qué otras palabras debería mirar esta palabra para entender su rol? ¿Quién hace qué? ¿Sobre qué? ¿En qué contexto? Los números de la matriz indican cuánta atención se presta a cada otra palabra; eso se calcula matemáticamente.</p>
+
+            <h5 className="font-semibold">⚠ Mito vs Realidad</h5>
+            <p><strong>⚠ Mito:</strong> &ldquo;El modelo solo lee palabra por palabra, como nosotros en voz alta.&rdquo;</p>
+            <p><strong>✅ Realidad:</strong> &ldquo;El modelo conecta todas las palabras entre sí en paralelo y les asigna pesos de importancia. Eso es self-attention.&rdquo;</p>
+
+            <h5 className="font-semibold">🧠 Q / K / V (Query, Key, Value)</h5>
+            <p>Para cada palabra el modelo genera tres vectores distintos:</p>
+            <ul className="list-disc list-inside">
+              <li><strong>🔍 Query (Q)</strong> = &ldquo;lo que estoy buscando&rdquo;</li>
+              <li><strong>🔑 Key (K)</strong> = &ldquo;qué ofrezco&rdquo; (tarjeta de identificación)</li>
+              <li><strong>📦 Value (V)</strong> = &ldquo;mi contenido útil&rdquo;</li>
+            </ul>
+            <p>Flujo: comparamos Query de una palabra con los Keys de TODAS las palabras → obtenemos pesos → hacemos un promedio ponderado de los Values.</p>
+
+            <h5 className="font-semibold">🔢 Fórmula</h5>
+            <p className="font-mono">Attention = Softmax(Q · K<sup>T</sup> / √d<sub>k</sub>) · V</p>
+            <p>Q · K<sup>T</sup> = qué tan bien encaja lo que busco (Q) con lo que cada palabra ofrece (K). √d<sub>k</sub> = factor de escala. Softmax = convierte esos puntajes en porcentajes. Multiplicar por V mezcla la información de las palabras más relevantes.</p>
+
+            <h5 className="font-semibold">👥 ¿Por qué varias cabezas?</h5>
+            <p>No usamos una sola matriz sino varias en paralelo (multi-head). Cada cabeza se enfoca en diferentes relaciones (sujeto-verbo, verbo-objeto, modificadores, puntuación). Luego se combinan para una comprensión más rica. Modelos grandes usan muchas cabezas.</p>
+
+            <h5 className="font-semibold">📌 Conexión con el resto del modelo</h5>
+            <p>El resultado de self-attention es una nueva versión de cada palabra contextualizada; esa representación pasa a las siguientes capas y finalmente se usa para predecir la siguiente palabra con una distribución de probabilidad.</p>
+          <h5 className="font-semibold text-lg text-slate-200 mt-4">🎯 ¿Qué es una &ldquo;cabeza de atención&rdquo;?</h5>
+          <p className="text-sm leading-relaxed">El modelo usa varias &ldquo;cabezas de atención&rdquo; al mismo tiempo. Cada cabeza actúa como un lector distinto: una puede enfocarse en sujeto ↔ verbo, otra en objeto, otra en matices, etc. En el selector de &quot;Cabeza&quot; puedes ver cada una de esas perspectivas por separado.</p>
+          <p className="text-sm leading-relaxed mt-2">El resultado de self-attention es una versión contextualizada de cada palabra. Después de este paso, el modelo ya no ve palabras aisladas, sino ideas conectadas en contexto; esa representación contextual se usa en el siguiente paso para calcular probabilidades.</p>
+            <h5 className="font-semibold">📚 Bibliografía / Lecturas recomendadas</h5>
+            <ul className="list-disc list-inside text-slate-400">
+              <li><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noreferrer" className="text-blue-300 underline">Vaswani, A. et al. (2017). Attention Is All You Need</a></li>
+              <li><a href="https://arxiv.org/abs/1810.04805" target="_blank" rel="noreferrer" className="text-blue-300 underline">Devlin, J. et al. (2018). BERT: Pre-training of Deep Bidirectional Transformers</a></li>
+              <li><a href="https://arxiv.org/abs/1508.07909" target="_blank" rel="noreferrer" className="text-blue-300 underline">Sennrich, R. et al. (2016). Neural Machine Translation of Rare Words with Subword Units</a></li>
+            </ul>
+          </div>
+        </details>
       </div>
     )}
       </div>
