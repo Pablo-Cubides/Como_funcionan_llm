@@ -1,36 +1,23 @@
 {
-  "name": "exploramodelo",
+  "name": "exploramodelo-monorepo",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint \"**/*.{js,cjs,mjs,ts,tsx}\"",
-    "lint:ci": "eslint \"src/**/*.{ts,tsx}\" --max-warnings=0",
-    "test": "vitest --run --globals",
-    "test:unit": "vitest --run --globals"
-  },
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "next": "14.2.3"
+    "dev": "npm run dev --workspace=packages/app",
+    "build": "npm run build --workspace=packages/app",
+    "start": "npm run start --workspace=packages/app",
+    "test": "npm run test --workspace=packages/app",
+    "test:unit": "npm run test:unit --workspace=packages/app",
+    "lint": "npm run lint --workspace=packages/app",
+    "e2e": "npm run e2e --workspace=packages/app",
+    "embed:build": "npm run build --workspace=packages/embed",
+    "embed:dev": "npm run dev --workspace=packages/embed"
   },
   "devDependencies": {
     "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
-    "eslint": "^8.0.0",
-    "eslint-config-next": "14.2.3",
-    "@eslint/eslintrc": "^3",
-    "@typescript-eslint/parser": "^6.6.0",
-    "@typescript-eslint/eslint-plugin": "^6.6.0",
-    "vitest": "^1.0.0",
-    "@testing-library/react": "^14.0.0",
-    "@testing-library/jest-dom": "^6.0.0",
-    "jsdom": "^22.0.0"
+    "@types/node": "^20"
   }
 }

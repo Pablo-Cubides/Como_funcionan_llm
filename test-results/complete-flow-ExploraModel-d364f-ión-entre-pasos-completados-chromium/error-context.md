@@ -1,0 +1,138 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]: 🧠
+          - generic [ref=e7]:
+            - heading "ExploraModelo" [level=1] [ref=e8]
+            - paragraph [ref=e9]: Aprende cómo funcionan los LLM paso a paso
+        - generic [ref=e11]:
+          - generic [ref=e12]: Modo Explicación
+          - generic [ref=e13]:
+            - checkbox [checked]
+    - generic [ref=e16]:
+      - generic [ref=e17] [cursor=pointer]:
+        - generic [ref=e18]: ✓
+        - generic [ref=e19]: Entrada
+      - generic [ref=e21] [cursor=pointer]:
+        - generic [ref=e22]: 🔤
+        - generic [ref=e23]: Tokenización
+      - generic [ref=e25] [cursor=pointer]:
+        - generic [ref=e26]: 📊
+        - generic [ref=e27]: Embeddings
+      - generic [ref=e29] [cursor=pointer]:
+        - generic [ref=e30]: 🎯
+        - generic [ref=e31]: Atención
+      - generic [ref=e33] [cursor=pointer]:
+        - generic [ref=e34]: 📈
+        - generic [ref=e35]: Probabilidades
+      - generic [ref=e37] [cursor=pointer]:
+        - generic [ref=e38]: ✨
+        - generic [ref=e39]: Generación
+      - generic [ref=e41] [cursor=pointer]:
+        - generic [ref=e42]: 📚
+        - generic [ref=e43]: Bibliografía
+    - main [ref=e44]:
+      - generic [ref=e45]:
+        - generic [ref=e46]:
+          - heading "🔤 Tokenización" [level=2] [ref=e47]
+          - paragraph [ref=e48]: Observa cómo el texto se divide en tokens individuales
+        - generic [ref=e50]:
+          - generic [ref=e51]:
+            - generic [ref=e52]: 🔤
+            - heading "Tokenización" [level=2] [ref=e53]
+            - paragraph [ref=e55]:
+              - text: El texto se divide en
+              - strong [ref=e56]: tokens
+              - text: (palabras o sub-palabras) y a cada uno se le asigna un
+              - strong [ref=e57]: ID numérico
+              - text: único de un vocabulario predefinido.
+          - generic [ref=e58]:
+            - generic [ref=e59]:
+              - generic [ref=e60]:
+                - text: 📝
+                - heading "Texto Original:" [level=3] [ref=e61]
+              - paragraph [ref=e62]: Los pájaros vuelan porque tienen alas
+            - generic [ref=e64]:
+              - generic [ref=e65]: ⬇️
+              - generic [ref=e66]: TOKENIZACIÓN
+            - generic [ref=e67]:
+              - generic [ref=e68]:
+                - text: 🎨
+                - heading "Tokens & IDs:" [level=3] [ref=e69]
+                - generic [ref=e71]: 6 tokens detectados
+              - generic [ref=e72]:
+                - generic:
+                  - generic:
+                    - generic: Los
+                    - generic: "1"
+                  - generic: ID:6592
+                - generic:
+                  - generic:
+                    - generic: pájaros
+                    - generic: "2"
+                  - generic: ID:5090
+                - generic:
+                  - generic:
+                    - generic: vuelan
+                    - generic: "3"
+                  - generic: ID:9725
+                - generic:
+                  - generic:
+                    - generic: porque
+                    - generic: "4"
+                  - generic: ID:3058
+                - generic:
+                  - generic:
+                    - generic: tienen
+                    - generic: "5"
+                  - generic: ID:8233
+                - generic:
+                  - generic:
+                    - generic: alas
+                    - generic: "6"
+                  - generic: ID:6637
+            - 'button "Siguiente: Embeddings →" [ref=e74] [cursor=pointer]':
+              - generic [ref=e75]: "Siguiente: Embeddings"
+              - generic [ref=e76]: →
+            - generic [ref=e77]:
+              - generic [ref=e78]:
+                - generic [ref=e79]:
+                  - text: ❓
+                  - heading "¿Cómo funciona la tokenización?" [level=3] [ref=e80]
+                - list [ref=e81]:
+                  - listitem [ref=e82]:
+                    - text: ✂️
+                    - generic [ref=e83]:
+                      - strong [ref=e84]: "División:"
+                      - text: El texto se corta en las piezas mínimas que el modelo puede reconocer.
+                  - listitem [ref=e85]:
+                    - text: 📖
+                    - generic [ref=e86]:
+                      - strong [ref=e87]: "Vocabulario:"
+                      - text: Cada token se busca en un vocabulario gigante. Ese vocabulario devuelve un número (ID).
+                  - listitem [ref=e88]:
+                    - text: 🔄
+                    - generic [ref=e89]:
+                      - strong [ref=e90]: "Consistencia:"
+                      - text: "El mismo token siempre recibe el mismo ID. Ejemplo: \"Para\" siempre → ID 128."
+                  - listitem [ref=e91]:
+                    - text: 🧩
+                    - generic [ref=e92]:
+                      - strong [ref=e93]: "Sub-palabras:"
+                      - text: "Palabras desconocidas se dividen en partes. Ejemplo:"
+                      - emphasis [ref=e94]: resúmenes
+                      - text: → resú + menes.
+                  - listitem [ref=e95]:
+                    - text: ❗
+                    - generic [ref=e96]:
+                      - strong [ref=e97]: "Puntuación cuenta:"
+                      - text: Coma, punto, signos... todos reciben su propio ID para aprender tono y pausas.
+              - group [ref=e98]:
+                - generic "🔬Explicación Técnica Detallada" [ref=e99]
+  - alert [ref=e100]
+```

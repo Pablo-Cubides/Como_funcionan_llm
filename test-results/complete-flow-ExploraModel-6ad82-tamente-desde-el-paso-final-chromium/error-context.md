@@ -1,0 +1,74 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]: 🧠
+          - generic [ref=e7]:
+            - heading "ExploraModelo" [level=1] [ref=e8]
+            - paragraph [ref=e9]: Aprende cómo funcionan los LLM paso a paso
+        - generic [ref=e11]:
+          - generic [ref=e12]: Modo Explicación
+          - generic [ref=e13]:
+            - checkbox [checked]
+    - generic [ref=e16]:
+      - generic [ref=e17] [cursor=pointer]:
+        - generic [ref=e18]: ✓
+        - generic [ref=e19]: Entrada
+      - generic [ref=e21] [cursor=pointer]:
+        - generic [ref=e22]: ✓
+        - generic [ref=e23]: Tokenización
+      - generic [ref=e25] [cursor=pointer]:
+        - generic [ref=e26]: ✓
+        - generic [ref=e27]: Embeddings
+      - generic [ref=e29] [cursor=pointer]:
+        - generic [ref=e30]: ✓
+        - generic [ref=e31]: Atención
+      - generic [ref=e33] [cursor=pointer]:
+        - generic [ref=e34]: ✓
+        - generic [ref=e35]: Probabilidades
+      - generic [ref=e37] [cursor=pointer]:
+        - generic [ref=e38]: ✨
+        - generic [ref=e39]: Generación
+      - generic [ref=e41] [cursor=pointer]:
+        - generic [ref=e42]: 📚
+        - generic [ref=e43]: Bibliografía
+    - main [ref=e44]:
+      - generic [ref=e45]:
+        - generic [ref=e46]:
+          - heading "✨ Generación" [level=2] [ref=e47]
+          - paragraph [ref=e48]: "Generamos texto autoregresivamente: predecir → agregar → repetir"
+        - generic [ref=e50]:
+          - generic [ref=e51]:
+            - 'heading "Paso 5: Generación Autoregresiva" [level=2] [ref=e52]'
+            - paragraph [ref=e53]:
+              - text: El modelo añade su predicción al texto de entrada y repite todo el proceso para generar el siguiente token. Este
+              - strong [ref=e54]: bucle de retroalimentación
+              - text: es la base de la generación de texto.
+          - generic [ref=e55]:
+            - generic [ref=e56]:
+              - heading "✨Texto en Construcción" [level=3] [ref=e57]
+              - paragraph [ref=e59]:
+                - generic [ref=e60]: Los
+                - generic [ref=e61]: pájaros
+                - generic [ref=e62]: vuelan
+                - generic [ref=e63]: porque
+                - generic [ref=e64]: tienen
+                - text: alas▌
+              - group [ref=e65]:
+                - generic "👁️ Ver tokens individuales" [ref=e66]
+            - generic [ref=e68]:
+              - generic [ref=e69]:
+                - text: "Estrategia de Muestreo:"
+                - combobox "Estrategia de Muestreo:" [ref=e70] [cursor=pointer]:
+                  - option "🎯 Greedy (el más probable)" [selected]
+                  - option "🎲 Random (aleatorio)"
+                  - option "🔝 Top-k (top 5)"
+              - button "Generar Siguiente Token →" [ref=e72] [cursor=pointer]:
+                - generic [ref=e73]: Generar Siguiente Token
+                - generic [ref=e74]: →
+  - alert [ref=e75]
+```

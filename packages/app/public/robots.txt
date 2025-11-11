@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /.next/
+Disallow: /_next/
+
+# Allow access to static assets
+Allow: /favicon.ico
+Allow: /icon.svg
+Allow: /apple-touch-icon.png
+Allow: /og-image.png
+
+# Sitemap
+Sitemap: https://exploramodelo.com/sitemap.xml

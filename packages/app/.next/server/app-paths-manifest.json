@@ -1,0 +1,8 @@
+{
+  "/api/export/route": "app/api/export/route.js",
+  "/test/page": "app/test/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/api/log/route": "app/api/log/route.js",
+  "/page": "app/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js"
+}

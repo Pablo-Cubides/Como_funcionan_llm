@@ -1,0 +1,76 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]: 🧠
+          - generic [ref=e7]:
+            - heading "ExploraModelo" [level=1] [ref=e8]
+            - paragraph [ref=e9]: Aprende cómo funcionan los LLM paso a paso
+        - generic [ref=e11]:
+          - generic [ref=e12]: Modo Explicación
+          - generic [ref=e13]:
+            - checkbox [checked]
+    - generic [ref=e16]:
+      - generic [ref=e17] [cursor=pointer]:
+        - generic [ref=e18]: ✏️
+        - generic [ref=e19]: Entrada
+      - generic [ref=e21] [cursor=pointer]:
+        - generic [ref=e22]: 🔤
+        - generic [ref=e23]: Tokenización
+      - generic [ref=e25] [cursor=pointer]:
+        - generic [ref=e26]: 📊
+        - generic [ref=e27]: Embeddings
+      - generic [ref=e29] [cursor=pointer]:
+        - generic [ref=e30]: 🎯
+        - generic [ref=e31]: Atención
+      - generic [ref=e33] [cursor=pointer]:
+        - generic [ref=e34]: 📈
+        - generic [ref=e35]: Probabilidades
+      - generic [ref=e37] [cursor=pointer]:
+        - generic [ref=e38]: ✨
+        - generic [ref=e39]: Generación
+      - generic [ref=e41] [cursor=pointer]:
+        - generic [ref=e42]: 📚
+        - generic [ref=e43]: Bibliografía
+    - main [ref=e44]:
+      - generic [ref=e45]:
+        - generic [ref=e46]:
+          - heading "✏️ Entrada" [level=2] [ref=e47]
+          - paragraph [ref=e48]: Escribe o selecciona un texto de ejemplo para comenzar el proceso
+        - generic [ref=e50]:
+          - generic [ref=e51]:
+            - generic [ref=e52]: ✏️
+            - heading "Bienvenido a ExploraModelo" [level=1] [ref=e53]
+            - paragraph [ref=e55]: Descubre cómo funcionan los modelos de lenguaje paso a paso. Escribe una frase y observa el proceso completo desde la entrada hasta la generación de texto.
+          - generic [ref=e56]:
+            - generic [ref=e57]:
+              - generic [ref=e58]: "💭Escribe una frase para analizar:"
+              - generic [ref=e59]:
+                - textbox "💭Escribe una frase para analizar:" [active] [ref=e60]:
+                  - /placeholder: "Ej: La inteligencia artificial es fascinante..."
+                  - text: palabra palabra palabra palabra palabra palabra palabra palabra palabra palabra palabra palabra palabra palabra palabra palabra palabra palabra palabra palabra palabra palabra palabra palabra palabra
+                - generic [ref=e61]:
+                  - generic [ref=e62]: 25 / 50 tokens
+                  - generic [ref=e63]: 200 / 200
+            - generic [ref=e65]: O selecciona un ejemplo
+            - generic [ref=e66]:
+              - heading "🎯Ejemplos rápidos:" [level=3] [ref=e67]
+              - generic [ref=e68]:
+                - button "🐦Los pájaros vuelan porque tienen alas" [ref=e69] [cursor=pointer]:
+                  - generic [ref=e70]: 🐦Los pájaros vuelan porque tienen alas
+                - button "🤖La inteligencia artificial es una tecnología fascinante" [ref=e71] [cursor=pointer]:
+                  - generic [ref=e72]: 🤖La inteligencia artificial es una tecnología fascinante
+                - button "📚Para estudiar mejor, recomiendo hacer resúmenes" [ref=e73] [cursor=pointer]:
+                  - generic [ref=e74]: 📚Para estudiar mejor, recomiendo hacer resúmenes
+                - button "💧El agua hierve cuando alcanza cien grados" [ref=e75] [cursor=pointer]:
+                  - generic [ref=e76]: 💧El agua hierve cuando alcanza cien grados
+            - button "🚀 Comenzar Análisis →" [ref=e78] [cursor=pointer]:
+              - generic [ref=e79]: 🚀
+              - generic [ref=e80]: Comenzar Análisis
+              - generic [ref=e81]: →
+  - alert [ref=e82]
+```

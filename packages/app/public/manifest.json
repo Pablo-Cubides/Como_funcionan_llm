@@ -1,0 +1,24 @@
+{
+  "name": "ExploraModelo - Aprende cómo funcionan los LLM",
+  "short_name": "ExploraModelo",
+  "description": "Aplicación educativa interactiva que explica paso a paso cómo funcionan los modelos de lenguaje",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0b0f",
+  "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
+  "categories": ["education", "productivity"],
+  "lang": "es-ES",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "32x32",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    }
+  ]
+}

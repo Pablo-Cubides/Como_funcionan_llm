@@ -1,0 +1,18 @@
+<svg width="180" height="180" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="appleBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4f46e5;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle with rounded corners -->
+  <rect width="180" height="180" rx="40" ry="40" fill="url(#appleBg)"/>
+
+  <!-- Brain icon -->
+  <g transform="translate(45, 55)">
+    <path d="M45 18c-10 0-18 8-18 18v36c0 10 8 18 18 18h18v-18h-9c-5 0-9-4-9-9v-18c0-5 4-9 9-9h36c5 0 9 4 9 9v18c0 5-4 9-9 9h-9v18h18c10 0 18-8 18-18V36c0-10-8-18-18-18H45z" fill="white"/>
+    <circle cx="30" cy="33" r="7" fill="#10b981"/>
+    <circle cx="75" cy="33" r="7" fill="#10b981"/>
+  </g>
+</svg>
